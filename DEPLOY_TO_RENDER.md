@@ -106,27 +106,42 @@ The `render.yaml` file is a blueprint that automatically creates all services.
 
 4. **Set Environment Variables**
    - Before clicking "Apply", you'll see a list of environment variables
-   - Fill in your API keys:
+   - Fill in your **backend** API keys (REQUIRED - at least one LLM provider):
      ```
      OPENAI_API_KEY=sk-...
      TAVILY_API_KEY=tvly-...
      (and other keys you have)
      ```
-   - Leave others blank if you don't have them
+   - **IMPORTANT**: Leave `NEXT_PUBLIC_API_URL` blank for now (you'll set it in step 7)
+   - Leave other optional keys blank if you don't have them
 
 5. **Apply Blueprint**
    - Click **"Apply"**
-   - Render will create all 3 services automatically
-   - Wait 5-10 minutes for first deployment
+   - Render will create all 3 services and start deploying
+   - **Backend will deploy successfully**
+   - **Frontend will deploy but may not work yet** (needs backend URL)
+   - Wait 5-10 minutes for deployments
 
-6. **Note Your URLs**
-   - Backend: `https://research-agent-backend.onrender.com`
-   - Frontend: `https://research-agent-frontend.onrender.com`
-   - Save these URLs!
+6. **Get Backend URL**
+   - Once backend deployment completes, click on **research-agent-backend** service
+   - Copy the service URL (e.g., `https://research-agent-backend.onrender.com`)
+   - Verify backend is working by visiting: `https://research-agent-backend.onrender.com/health`
+   - Should return: `{"status": "healthy", "service": "research-api"}`
 
-7. **Access Your Application**
-   - Open the frontend URL in your browser
+7. **Configure Frontend with Backend URL**
+   - Click on **research-agent-frontend** service
+   - Go to **Environment** tab
+   - Find `NEXT_PUBLIC_API_URL` variable
+   - Set it to your backend URL: `https://research-agent-backend.onrender.com`
+   - **DO NOT include trailing slash**
+   - Click **"Save Changes"**
+   - Frontend will automatically redeploy (wait 3-5 minutes)
+
+8. **Access Your Application**
+   - Once frontend redeployment completes, open the frontend URL
+   - Should be: `https://research-agent-frontend.onrender.com`
    - First load will take 30-60 seconds (cold start)
+   - Try a simple research query to verify everything works!
 
 ---
 
