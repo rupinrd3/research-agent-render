@@ -77,8 +77,8 @@ async def lifespan(app: FastAPI):
     # Load settings (config.yaml is in parent directory when run from backend/)
     settings = load_settings("../config.yaml")
 
-    # Initialize database
-    await init_database(settings.database.url, echo=settings.database.echo)
+    # Initialize database (with async driver transformation)
+    await init_database(settings.database.get_async_url(), echo=settings.database.echo)
 
     # Initialize dependencies (without LLM manager - will be lazy loaded)
     initialize_dependencies(settings, init_llm=False)

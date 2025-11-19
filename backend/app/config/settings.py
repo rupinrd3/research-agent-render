@@ -93,6 +93,26 @@ class DatabaseSettings(BaseModel):
     url: str = "sqlite+aiosqlite:///./research.db"
     echo: bool = False
 
+    def get_async_url(self) -> str:
+        """
+        Get database URL with async driver.
+
+        Transforms postgres:// or postgresql:// URLs to use asyncpg driver.
+        Leaves other URLs (like SQLite) unchanged.
+
+        Returns:
+            Database URL with appropriate async driver
+        """
+        url = self.url
+
+        # Transform PostgreSQL URLs to use asyncpg driver
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and "+asyncpg" not in url:
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+        return url
+
 
 class APISettings(BaseModel):
     """API server settings."""

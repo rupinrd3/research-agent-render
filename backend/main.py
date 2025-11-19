@@ -79,7 +79,7 @@ async def main():
     # Initialize database
     try:
         print("Initializing database...")
-        await init_database(settings.database.url, settings.database.echo)
+        await init_database(settings.database.get_async_url(), settings.database.echo)
         print("✓ Database initialized")
     except Exception as e:
         print(f"✗ Failed to initialize database: {e}")
