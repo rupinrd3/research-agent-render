@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(python test_imports.py:*)",
+      "Bash(python validate_system.py:*)",
+      "Bash(README.md)",
+      "Bash(requirements.txt)",
+      "Bash(dir:*)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(timeout 10 python:*)",
+      "WebSearch",
+      "Bash(nul)",
+      "Bash(pip show:*)",
+      "Bash(findstr:*)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:docs.tavily.com)",
+      "WebFetch(domain:serper.dev)",
+      "WebFetch(domain:serpapi.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:python.langchain.com)",
+      "WebFetch(domain:docs.haystack.deepset.ai)",
+      "WebFetch(domain:api.python.langchain.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

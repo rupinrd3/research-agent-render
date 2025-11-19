@@ -1,0 +1,69 @@
+# Render Blueprint - Agentic AI Research Lab
+# Deploy this application to Render Free Tier
+#
+# Documentation: https://render.com/docs/blueprint-spec
+
+services:
+  # Backend API Service (Python FastAPI)
+  - type: web
+    name: research-agent-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: PORT
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: research-db
+          property: connectionString
+      # LLM Provider API Keys (set these in Render dashboard)
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      # Search Provider API Keys
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: SERPAPI_API_KEY
+        sync: false
+      # Optional
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: LANGSMITH_API_KEY
+        sync: false
+
+  # Frontend Service (Next.js)
+  - type: web
+    name: research-agent-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: PORT
+        generateValue: true
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: research-agent-backend
+          property: hostport
+
+databases:
+  # PostgreSQL Database (Free tier - 30 days only!)
+  - name: research-db
+    plan: free
+    databaseName: research_db
+    user: research_user

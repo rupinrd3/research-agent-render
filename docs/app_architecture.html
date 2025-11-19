@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Research Lab – Application Architecture and Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-code: #f3f4f6;
+            --border-color: #e5e7eb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .nav-wrapper {
+            background: var(--bg-secondary);
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .toc {
+            padding: 1.5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .toc h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .toc a {
+            display: block;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-left: 3px solid var(--accent-color);
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+            font-size: 0.95rem;
+        }
+
+        .toc a:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-lg);
+            border-left-color: var(--primary-color);
+            background: var(--bg-secondary);
+        }
+
+        .content {
+            padding: 3rem 2rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 100px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin: 2rem 0 1rem;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        code {
+            background: var(--bg-code);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #d63384;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .info-box strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .footer {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            text-align: center;
+            border-top: 2px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 2rem 1.5rem;
+            }
+
+            .toc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .nav-wrapper {
+                position: static;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Agentic Research Lab</h1>
+            <p>Application Architecture and Design Documentation</p>
+        </header>
+
+        <nav class="nav-wrapper">
+            <div class="toc">
+                <h2>📑 Table of Contents</h2>
+                <div class="toc-grid">
+                    <a href="#section-1">1. Purpose and Overview</a>
+                    <a href="#section-2">2. Research Session Flow</a>
+                    <a href="#section-3">3. Backend Architecture</a>
+                    <a href="#section-4">4. Session Lifecycle</a>
+                    <a href="#section-5">5. ResearcherAgent</a>
+                    <a href="#section-6">6. EvaluatorAgent</a>
+                    <a href="#section-7">7. LLM Orchestration</a>
+                    <a href="#section-8">8. Tracing & Metrics</a>
+                    <a href="#section-9">9. Real-Time Transport</a>
+                    <a href="#section-10">10. Frontend Architecture</a>
+                    <a href="#section-11">11. Frontend Updates</a>
+                    <a href="#section-12">12. ReAct Trace Timeline</a>
+                    <a href="#section-13">13. Workflow Chart</a>
+                    <a href="#section-14">14. Backend-Frontend Mapping</a>
+                    <a href="#section-15">15. Error Handling</a>
+                    <a href="#section-16">16. Extensibility</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="content">
+            <section id="section-1">
+                <h2>1. Purpose and High-Level Overview</h2>
+
+                <div class="info-box">
+                    <strong>Goal</strong>
+                    Turn a natural-language research query into a structured, well-sourced report.
+                </div>
+
+                <p><strong>Core idea:</strong> A <span class="highlight">Researcher agent</span> (ReAct pattern) iteratively reasons and uses tools, then an <span class="highlight">Evaluator agent</span> performs a quality review on the final report.</p>
+
+                <h3>User Experience</h3>
+                <ul>
+                    <li>User submits a query from the web UI</li>
+                    <li>Backend starts a <strong>research session</strong> and runs the agents in the background</li>
+                    <li>The frontend receives <strong>live events</strong> over WebSockets/SSE and visualizes:
+                        <ul>
+                            <li>A <strong>horizontal workflow chart</strong> (THINK → OPERATE → REFLECT → EVALUATOR → FINISH)</li>
+                            <li>A <strong>ReAct trace timeline</strong> showing Thought → Action → Observation per iteration</li>
+                        </ul>
+                    </li>
+                    <li>When finished, the user sees a report, metrics, and evaluation scores</li>
+                </ul>
+
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Session:</strong> One complete run from query to final report</li>
+                    <li><strong>Iteration:</strong> One ReAct loop of thought → tool action → observation</li>
+                    <li><strong>Trace event:</strong> A structured record of something that happened (e.g. "thought", "tool_execution")</li>
+                    <li><strong>Evaluation:</strong> End-to-end quality assessment of the final report</li>
+                </ul>
+            </section>
+
+            <section id="section-2">
+                <h2>2. End-to-End Research Session Flow</h2>
+
+                <h3>2.1 High-Level Journey</h3>
+
+                <ol>
+                    <li><strong>User submits a query</strong>
+                        <p>Frontend sends <code>POST /api/research/start</code> with the query and optional overrides (e.g. preferred provider, model, max iterations).</p>
+                    </li>
+                    <li><strong>Backend creates a research session</strong>
+                        <ul>
+                            <li>Session is stored in the DB with status <code>running</code></li>
+                            <li>A background task is launched to run the research logic</li>
+                            <li>Backend returns: <code>session_id</code> and <code>websocket_url</code> (<code>/ws/{session_id}</code>) for live updates</li>
+                        </ul>
+                    </li>
+                    <li><strong>Frontend connects for live updates</strong>
+                        <p>The React app uses a <code>useWebSocket</code> hook to connect to <code>/ws/{session_id}</code> (or SSE <code>/ws/{session_id}/stream</code>). All real-time messages are normalized into a <code>ResearchUpdate</code> structure.</p>
+                    </li>
+                    <li><strong>Researcher agent runs the ReAct loop</strong>
+                        <p>For each iteration:</p>
+                        <ul>
+                            <li><strong>THINK:</strong> Reason about what to do next</li>
+                            <li><strong>ACT:</strong> Call tools (web search, arxiv, github, PDF, content pipeline)</li>
+                            <li><strong>OBSERVE:</strong> Interpret tool outputs</li>
+                            <li>Decide whether to <strong>loop</strong> or <strong>finish</strong></li>
+                        </ul>
+                        <p>Each stage produces <strong>trace events</strong> that the frontend visualizes.</p>
+                    </li>
+                    <li><strong>Evaluator agent runs the quality review</strong>
+                        <p>Once the Researcher calls <code>finish</code>, the Evaluator reviews the final report. It outputs scalar scores (relevance, accuracy, completeness, source quality) and qualitative feedback.</p>
+                    </li>
+                    <li><strong>Session completes</strong>
+                        <ul>
+                            <li>Backend emits a <code>completion</code>/<code>session_complete</code> event with the final report and metrics</li>
+                            <li>DB is updated with report, sources, cost, and iteration counts</li>
+                        </ul>
+                    </li>
+                    <li><strong>User reviews results</strong>
+                        <ul>
+                            <li>ReAct trace timeline shows how the answer was built</li>
+                            <li>Workflow chart shows how many iterations were needed and where the evaluator stepped in</li>
+                            <li>Metrics dashboard aggregates latency, tool usage, and evaluation scores</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+
+            <section id="section-3">
+                <h2>3. Backend Architecture Overview</h2>
+
+                <p>The backend is a FastAPI application (<code>backend/app</code>) with the following key modules:</p>
+
+                <h3>API Layer (<code>app/api</code>)</h3>
+                <ul>
+                    <li><code>routes/research.py</code> – session lifecycle (start, status, trace, evaluation)</li>
+                    <li><code>websocket.py</code> – real-time transport (WebSockets + SSE)</li>
+                    <li><code>models/requests.py</code> and <code>models/responses.py</code> – typed API contracts</li>
+                </ul>
+
+                <h3>Agent Layer (<code>app/agents</code>)</h3>
+                <ul>
+                    <li><code>react_agent.py</code> – <strong>ResearcherAgent</strong>, the main ReAct loop</li>
+                    <li><code>evaluator_agent.py</code> – <strong>EvaluatorAgent</strong>, end-to-end quality assessment</li>
+                    <li><code>models.py</code> – data structures for steps, results, and evaluations</li>
+                </ul>
+
+                <h3>LLM Layer (<code>app/llm</code>)</h3>
+                <ul>
+                    <li><code>manager.py</code> – <strong>LLMManager</strong>, orchestrates OpenAI, Gemini, and OpenRouter with fallback</li>
+                    <li><code>openai_provider.py</code>, <code>gemini_provider.py</code>, <code>openrouter_provider.py</code> – provider integrations</li>
+                </ul>
+
+                <h3>Tools Layer (<code>app/tools</code>)</h3>
+                <ul>
+                    <li><code>web_search.py</code>, <code>arxiv_search.py</code>, <code>github_search.py</code>, <code>pdf_parser.py</code> – domain tools</li>
+                    <li><code>definitions.py</code> – tool schemas for function-calling</li>
+                </ul>
+
+                <h3>Supporting Modules</h3>
+                <ul>
+                    <li><code>app/content</code> – optional content pipeline for pre-retrieval/aggregation</li>
+                    <li><code>app/metrics</code> – metrics collection and history snapshots</li>
+                    <li><code>app/database</code> – session, trace, and evaluation persistence</li>
+                    <li><code>app/config/settings.py</code> – structured application settings</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Key design choice:</strong>
+                    The <strong>ResearcherAgent</strong> is a pure orchestrator of tools + LLM, while the <strong>API</strong> and <strong>WebSocket manager</strong> focus on IO, transport, and persistence.
+                </div>
+            </section>
+
+            <section id="section-4">
+                <h2>4. Research Session Lifecycle in the Backend</h2>
+
+                <h3>4.1 Starting a Session (<code>POST /api/research/start</code>)</h3>
+
+                <p><strong>Endpoint:</strong> <code>backend/app/api/routes/research.py: start_research</code></p>
+
+                <h4>Inputs (via <code>StartResearchRequest</code>):</h4>
+                <ul>
+                    <li><code>query</code> – the user's research question</li>
+                    <li>Optional overrides:
+                        <ul>
+                            <li><code>config.llm</code> – provider, model, temperature, fallback order</li>
+                            <li><code>config.research</code> – max_iterations, timeout_minutes</li>
+                            <li>Legacy shortcuts: <code>llm_provider</code>, <code>llm_model</code>, <code>temperature</code>, <code>max_iterations</code></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>Main steps:</h4>
+                <ol>
+                    <li><strong>Normalize configuration</strong> – <code>_normalize_request_config</code> merges legacy fields into a structured <code>config</code> block</li>
+                    <li><strong>Prepare session context</strong> – <code>_prepare_session_context</code>:
+                        <ul>
+                            <li>Clones base <code>Settings</code></li>
+                            <li>Applies per-session overrides for LLM provider/model and research parameters</li>
+                            <li>Creates a <strong>session-specific LLMManager</strong> if provider/model changed</li>
+                        </ul>
+                    </li>
+                    <li><strong>Create session record</strong> – <code>create_session</code> stores the session in the DB: <code>id</code>, <code>query</code>, <code>status="running"</code>, <code>config</code>, timestamps</li>
+                    <li><strong>Mark as active</strong> – An in-memory <code>_active_sessions</code> dict is updated: <code>session_id → True</code></li>
+                    <li><strong>Launch background research task</strong> – FastAPI <code>BackgroundTasks</code> schedules <code>_run_research_session(...)</code></li>
+                    <li><strong>Return handle to client</strong> – <code>StartResearchResponse</code> contains <code>session_id</code>, <code>websocket_url</code>, and <code>status="running"</code></li>
+                </ol>
+
+                <p>From this point on, the frontend uses the <code>session_id</code> and WebSocket URL to subscribe to live events.</p>
+
+                <h3>4.2 Monitoring and Managing Sessions</h3>
+                <ul>
+                    <li><strong>Status</strong> – <code>GET /api/research/{session_id}</code> returns <code>SessionResponse</code> with query, status, timestamps, totals, and final report</li>
+                    <li><strong>Trace</strong> – <code>GET /api/research/{session_id}/trace</code> returns a <code>TraceResponse</code> with all persisted trace events</li>
+                    <li><strong>Evaluation</strong> – <code>GET /api/research/{session_id}/evaluation</code> returns <code>EvaluationResponse</code> with end-to-end scores and feedback</li>
+                    <li><strong>Cancel</strong> – <code>POST /api/research/{session_id}/cancel</code> marks the session inactive and sets status <code>cancelled</code></li>
+                    <li><strong>Delete</strong> – <code>DELETE /api/research/{session_id}</code> marks the session as <code>deleted</code></li>
+                </ul>
+            </section>
+
+            <section id="section-5">
+                <h2>5. ResearcherAgent: ReAct Loop and Tool Use</h2>
+
+                <p>The <strong>ResearcherAgent</strong> (<code>backend/app/agents/react_agent.py</code>) implements the ReAct pattern:</p>
+
+                <div class="info-box">
+                    <strong>ReAct Pattern</strong>
+                    Think → Act (tool calls) → Observe → Repeat or Finish
+                </div>
+
+                <p>This is the core of the backend logic and the main driver of both the ReAct trace and the workflow chart.</p>
+
+                <h3>5.1 Inputs and Configuration</h3>
+
+                <p>The ResearcherAgent is constructed with:</p>
+                <ul>
+                    <li><strong>LLMManager</strong> – decides which LLM provider/model to call, with fallback</li>
+                    <li><strong>Research settings</strong> – <code>max_iterations</code>, <code>timeout_minutes</code> (from <code>Settings.research</code>)</li>
+                    <li><strong>Tool settings</strong> – which tools are enabled, timeouts, safety rules</li>
+                    <li><strong>Trace callback</strong> – async function that persists trace events to the DB</li>
+                    <li><strong>WebSocket manager</strong> – broadcasts live events to the frontend</li>
+                    <li><strong>Content pipeline</strong> (optional) – pre-retrieval and caching layer across tools</li>
+                    <li><strong>LLM temperature override</strong> – per-session reasoning temperature</li>
+                </ul>
+
+                <h3>5.2 Conversation Setup and System Prompt</h3>
+
+                <p>For each session, the agent:</p>
+                <ol>
+                    <li>Associates the persistent <code>session_id</code> with itself</li>
+                    <li>Initializes <code>conversation_history</code> with:
+                        <ul>
+                            <li>A <strong>system message</strong> containing the <code>SYSTEM_PROMPT</code> explaining the ReAct loop discipline, available tools, citation format, and report structure</li>
+                            <li>A <strong>user message</strong> containing the query and asking the agent to restate the plan and begin reasoning</li>
+                        </ul>
+                    </li>
+                    <li>Optionally injects more system messages for domain guidance and recency hints</li>
+                </ol>
+
+                <h3>5.3 Core ReAct Loop (Per Iteration)</h3>
+
+                <p>The main method <code>research(query, session_id=...)</code> executes a loop until either:</p>
+                <ul>
+                    <li>The final report is produced and approved, or</li>
+                    <li>Max iterations or timeout is reached, or</li>
+                    <li>The session is externally cancelled</li>
+                </ul>
+
+                <h4>Within the loop:</h4>
+
+                <ol>
+                    <li><strong>Session and iteration start</strong>
+                        <ul>
+                            <li>Emit <code>session_start</code> trace with <code>{ session_id, query, timestamp }</code></li>
+                            <li>For each iteration: increment counter, emit <code>iteration_start</code> trace</li>
+                            <li>Frontend interprets this as "THINK phase starting" for that iteration</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Reasoning step (THOUGHT)</strong>
+                        <ul>
+                            <li>Clean up any dangling tool calls in <code>conversation_history</code></li>
+                            <li>Call <code>LLMManager.complete(...)</code> with current conversation history and tool definitions</li>
+                            <li>Receive: thought (LLM content text), tool calls (functions with JSON arguments), usage stats</li>
+                            <li>Emit <code>thought</code> trace event with thought, tokens_used, provider, latency_ms</li>
+                            <li><strong>Frontend effects:</strong> ReAct trace shows THOUGHT block, workflow chart completes THINK node and activates OPERATE node</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Tool selection and ACTION/EXECUTION</strong>
+                        <ul>
+                            <li>For each suggested tool call:
+                                <ul>
+                                    <li>Apply safety and policy checks</li>
+                                    <li>Emit <code>action</code> trace with tool and parameters</li>
+                                    <li>Execute the tool with timeout via <code>_execute_tool_with_timeout</code></li>
+                                    <li>Emit <code>tool_execution</code> trace with duration_ms, success, result_summary, provider, result_count</li>
+                                </ul>
+                            </li>
+                            <li><strong>Frontend effects:</strong> ReAct trace shows ACTION and EXECUTION blocks, workflow chart transitions OPERATE from active to completed</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Observation and REFLECT</strong>
+                        <ul>
+                            <li>Agent synthesizes tool outputs into an observation describing what was learned and what remains unclear</li>
+                            <li>Emit <code>observation</code> trace with observation text</li>
+                            <li><strong>Frontend effects:</strong> ReAct trace shows OBSERVATION block, workflow chart activates REFLECT node</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Finish guard and loop decision</strong>
+                        <ul>
+                            <li>When LLM proposes <code>finish</code> tool:
+                                <ul>
+                                    <li>A "finish guard" checks if it's safe to stop (key aspects covered, sources sufficient)</li>
+                                    <li>Emit <code>finish_guard</code> trace with approved/feedback/hint</li>
+                                </ul>
+                            </li>
+                            <li>If <code>approved = false</code>: loop again (REFLECT → THINK edge becomes active)</li>
+                            <li>If <code>approved = true</code>: proceed to finish (REFLECT → EVALUATOR edge becomes active)</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Final report construction (FINISH)</strong>
+                        <ul>
+                            <li>When finishing is approved, agent collates evidence into final report and sources list</li>
+                            <li>Emit <code>finish</code> trace with report, sources, report_length, num_sources</li>
+                            <li><strong>Frontend effects:</strong> ReAct trace shows final iteration, workflow chart completes THINK/OPERATE/REFLECT and activates REFLECT→EVALUATOR edge</li>
+                        </ul>
+                    </li>
+
+                    <li><strong>Aggregating results</strong>
+                        <ul>
+                            <li>All iterations materialized as <code>AgentStep</code> objects</li>
+                            <li><code>ResearchResult</code> returned with: report, sources, steps, total_iterations, total_duration_seconds, total_tokens, total_cost_usd, final status</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3>5.4 What the ReAct Trace and Workflow Chart Are Really Showing</h3>
+
+                <ul>
+                    <li>The <strong>ReAct trace timeline</strong> is a per-iteration lens on the loop:
+                        <p>Each THOUGHT/ACTION/EXECUTION/OBSERVATION block corresponds to <code>thought</code>, <code>action</code>, <code>tool_execution</code>, <code>observation</code> events emitted by the ResearcherAgent.</p>
+                    </li>
+                    <li>The <strong>workflow chart</strong> is a high-level state machine:
+                        <p>Nodes (THINK/OPERATE/REFLECT/EVALUATOR/FINISH) light up and complete based on those same events. Looping behavior (reflect → think) is driven by <code>iteration_start</code> + <code>finish_guard</code> events.</p>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="section-6">
+                <h2>6. EvaluatorAgent: End-to-End Quality Review</h2>
+
+                <p>The <strong>EvaluatorAgent</strong> (<code>backend/app/agents/evaluator_agent.py</code>) performs a holistic evaluation of the final report after the ReAct loop finishes.</p>
+
+                <h3>6.1 When and How the Evaluator Runs</h3>
+
+                <p>Within <code>_run_research_session</code> (in <code>routes/research.py</code>):</p>
+
+                <ol>
+                    <li>After the ResearcherAgent returns a successful <code>ResearchResult</code>, an EvaluatorAgent is created using the same <code>LLMManager</code></li>
+                    <li>Before evaluation starts:
+                        <ul>
+                            <li>Emit <code>evaluator_start</code> trace with message "Evaluator agent started"</li>
+                            <li>Immediately broadcast via WebSocket</li>
+                            <li>Workflow chart response: REFLECT node's pulse stops, EVALUATOR node becomes active, reflect→evaluator edge animates</li>
+                        </ul>
+                    </li>
+                    <li>Call <code>evaluate_research(result, evaluate_steps=False)</code>:
+                        <p>The evaluator reads the final report and produces an end-to-end assessment. Per-step evaluation is disabled to keep costs bounded.</p>
+                    </li>
+                </ol>
+
+                <h3>6.2 Evaluation Dimensions and Output</h3>
+
+                <p>The evaluator returns an <code>EvaluationResult</code> with an <code>EndToEndEval</code>:</p>
+
+                <h4>Quantitative scores (0–1):</h4>
+                <ul>
+                    <li><code>relevance_score</code> – does the report stay focused on the query?</li>
+                    <li><code>accuracy_score</code> – how factually correct and faithful to sources is it?</li>
+                    <li><code>completeness_score</code> – are major angles and sub-questions covered?</li>
+                    <li><code>source_quality_score</code> – are the sources credible, varied, and appropriate?</li>
+                </ul>
+
+                <h4>Qualitative feedback:</h4>
+                <ul>
+                    <li><code>strengths</code> – what the report does particularly well</li>
+                    <li><code>weaknesses</code> – gaps, missing perspectives, or potential inaccuracies</li>
+                    <li><code>recommendations</code> – how a human researcher could deepen or refine the work</li>
+                </ul>
+
+                <h4>Cost metadata:</h4>
+                <ul>
+                    <li><code>tokens_used</code>, <code>cost_usd</code> for the evaluation itself</li>
+                </ul>
+
+                <h3>6.3 Persisting and Broadcasting Evaluation</h3>
+
+                <p>After evaluation completes:</p>
+
+                <ol>
+                    <li>Backend measures evaluation duration</li>
+                    <li>Constructs <code>evaluator_complete</code> payload with message, duration_seconds, scores (relevance, accuracy, completeness, source_quality)</li>
+                    <li>Two things happen:
+                        <ul>
+                            <li><strong>Trace persistence:</strong> <code>save_trace_event</code> stores <code>evaluator_complete</code> event for the session</li>
+                            <li><strong>Real-time broadcast:</strong> <code>websocket_manager.send_trace_event</code> sends event to connected clients</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h4>Frontend effects:</h4>
+                <ul>
+                    <li>Workflow chart: EVALUATOR node transitions to completed with metadata (evaluationScores, evaluationDuration); FINISH node marked completed with reportLength and sourceCount</li>
+                    <li>Metrics dashboard: Includes evaluation scores alongside latency, token, and cost metrics</li>
+                </ul>
+
+                <ol start="4">
+                    <li><strong>Persistence in the evaluation store</strong>
+                        <p><code>save_end_to_end_evaluation</code> writes the evaluation into the DB with scores, strengths, weaknesses, recommendations, tokens, and cost. <code>GET /api/research/{session_id}/evaluation</code> exposes this as <code>EvaluationResponse</code>.</p>
+                    </li>
+                </ol>
+
+                <h3>6.4 Conceptual Role in the System</h3>
+
+                <ul>
+                    <li>The ResearcherAgent focuses on <strong>coverage and synthesis</strong></li>
+                    <li>The EvaluatorAgent focuses on <strong>quality and trustworthiness</strong></li>
+                    <li>Together they form a two-agent architecture where one agent builds a strong draft report and the other acts as a reviewer, providing a lightweight but structured quality bar</li>
+                </ul>
+            </section>
+
+            <section id="section-7">
+                <h2>7. LLM Orchestration and Provider Strategy</h2>
+
+                <p>The <strong>LLMManager</strong> (<code>backend/app/llm/manager.py</code>) is the abstraction that lets agents treat "the LLM" as a single service, even though multiple providers and models may be involved behind the scenes.</p>
+
+                <h3>7.1 Supported Providers and Configuration</h3>
+
+                <h4>Providers:</h4>
+                <ul>
+                    <li><strong>OpenAI</strong> – models like <code>gpt-4o-mini</code>, <code>gpt-4o</code>, <code>gpt-4-turbo</code>, <code>gpt-3.5-turbo</code></li>
+                    <li><strong>Gemini</strong> – <code>gemini-2.5-flash</code>, <code>gemini-2.5-pro</code>, <code>gemini-1.5-pro</code></li>
+                    <li><strong>OpenRouter</strong> – typically configured with <code>nvidia/llama-3.3-nemotron-super-49b-v1.5</code> and optional alternates</li>
+                </ul>
+
+                <h4>Configuration (per session) includes:</h4>
+                <ul>
+                    <li><code>primary</code> – which provider to try first</li>
+                    <li><code>fallback_order</code> – ordered list of backup providers</li>
+                    <li>Per-provider settings – API key, model name, temperature, max tokens</li>
+                </ul>
+
+                <h3>7.2 Per-Session Overrides (from the API)</h3>
+
+                <p><code>_prepare_session_context</code> applies overrides from the start request:</p>
+
+                <ul>
+                    <li><code>config.llm.provider</code> – override the primary provider</li>
+                    <li><code>config.llm.model</code> – request a specific model for that provider</li>
+                    <li><code>config.llm.fallback_order</code> – explicit fallback sequence</li>
+                    <li><code>config.llm.temperature</code> – used as the agent's <code>llm_temperature</code></li>
+                    <li><code>config.research.max_iterations</code> / <code>timeout_minutes</code> – adjust ReAct loop limits</li>
+                </ul>
+
+                <p>Model overrides are validated against <code>VALID_MODEL_OVERRIDES</code> to avoid unsupported names. If any of provider/model/fallback overrides are present, a new <strong>session-scoped LLMManager</strong> is created so these changes do not affect other sessions.</p>
+
+                <h3>7.3 Fallback and Provider Failover Logic</h3>
+
+                <p>When an agent calls <code>LLMManager.complete(...)</code>:</p>
+
+                <ol>
+                    <li>Build a provider sequence: start with <code>primary</code>, append providers from <code>fallback_order</code> that are configured and not duplicates</li>
+                    <li>For each provider in sequence:
+                        <ul>
+                            <li>Skip if provider is temporarily disabled due to repeated failures</li>
+                            <li>Attempt the completion (call provider-specific implementation, enforce <code>require_content</code> and <code>require_tool_calls</code> if requested)</li>
+                            <li>On success: return content, tool calls, usage, model, and provider_used</li>
+                            <li>On failure: increment <code>provider_failure_counts</code> counter, optionally mark provider disabled for cooldown, continue to next provider</li>
+                        </ul>
+                    </li>
+                    <li>If all providers fail: raise error that eventually causes session to be marked <code>failed</code> and emits <code>error</code>/<code>session_failed</code> event to frontend</li>
+                </ol>
+
+                <p>This strategy gives resilience against:</p>
+                <ul>
+                    <li>Per-provider outages</li>
+                    <li>Misconfigurations (e.g., missing API keys)</li>
+                    <li>Temporary rate limiting or network issues</li>
+                </ul>
+
+                <h3>7.4 Cost and Token Accounting</h3>
+
+                <p>Each provider returns usage metadata: input tokens, output tokens, total tokens, model name used.</p>
+
+                <p>The LLMManager and agents:</p>
+                <ul>
+                    <li>Aggregate tokens and cost across all calls and providers per session</li>
+                    <li>Use provider-specific pricing to estimate <code>cost_usd</code></li>
+                    <li>Record per-call latencies</li>
+                </ul>
+
+                <p>These numbers feed into:</p>
+                <ul>
+                    <li><code>ResearchResult</code> (total tokens and cost per session)</li>
+                    <li><code>MetricsCollector</code> (per-call + aggregate metrics)</li>
+                    <li>Completion payloads that the frontend uses in the metrics dashboard</li>
+                </ul>
+            </section>
+
+            <section id="section-8">
+                <h2>8. Tracing, Metrics, and Storage</h2>
+
+                <p>Tracing and metrics are what make the system <strong>observable</strong> and <strong>explainable</strong>.</p>
+
+                <h3>8.1 Trace Events: Shape and Storage</h3>
+
+                <p>Every significant step in the ReAct + evaluation pipeline is a <strong>trace event</strong> with:</p>
+
+                <ul>
+                    <li><code>type</code> – event name (e.g. <code>session_start</code>, <code>iteration_start</code>, <code>thought</code>, <code>action</code>, <code>tool_execution</code>, <code>observation</code>, <code>finish_guard</code>, <code>finish</code>, <code>evaluator_start</code>, <code>evaluator_complete</code>)</li>
+                    <li><code>session_id</code> – which research run this belongs to</li>
+                    <li><code>iteration</code> – which iteration (if applicable)</li>
+                    <li><code>data</code> – structured payload for that event type</li>
+                    <li><code>timestamp</code> – when it happened</li>
+                </ul>
+
+                <p>Within ResearcherAgent, <code>_emit_trace(event_type, data, iteration)</code> is the single entry point that:</p>
+
+                <ol>
+                    <li>Normalizes data and injects default <code>message</code> strings</li>
+                    <li>Calls the <strong>trace callback</strong> if present: <code>save_trace_event(session_id, event_type, data, iteration)</code> stores it in the DB</li>
+                    <li>Calls the <strong>WebSocket manager</strong> if present: <code>send_trace_event(session_id, event_type, data)</code> broadcasts it to live clients</li>
+                </ol>
+
+                <p>If persisting fails (e.g., DB down), the error is logged but the agent continues so the session can still finish.</p>
+
+                <p>The <code>GET /api/research/{session_id}/trace</code> endpoint reads these stored events and returns them as a <code>TraceResponse</code> for offline inspection and analytics.</p>
+
+                <h3>8.2 Metrics Collection During a Session</h3>
+
+                <p><code>_run_research_session</code> creates a <code>MetricsCollector</code> at the start. As the ResearcherAgent runs, it records:</p>
+
+                <ul>
+                    <li>Per-iteration durations</li>
+                    <li>Tool executions (names, durations, success/failure)</li>
+                    <li>LLM calls (provider, model, tokens, latency)</li>
+                </ul>
+
+                <p>After evaluation completes, the collector is finalized with end-to-end evaluation scores and final report metadata.</p>
+
+                <p>The result is a metrics object containing:</p>
+
+                <ul>
+                    <li>Average and distribution of iteration latencies</li>
+                    <li>Per-tool average execution times and counts</li>
+                    <li>End-to-end duration, total tokens, total cost</li>
+                    <li>Iterations to completion</li>
+                    <li>Tool success/failure counts</li>
+                    <li>Provider failover counts and total LLM calls</li>
+                </ul>
+
+                <h3>8.3 History Snapshots and Metrics Dashboard</h3>
+
+                <p>A compact <strong>history snapshot</strong> is then created via <code>metrics.history.create_snapshot</code> and appended via <code>append_run</code>:</p>
+
+                <ul>
+                    <li>This snapshot is designed for time-series and comparative dashboards</li>
+                    <li>It captures the essential metrics for that run in a stable schema</li>
+                </ul>
+
+                <h4>Frontend usage:</h4>
+                <ul>
+                    <li>The <code>completion</code> event includes a simplified metrics payload for the <strong>current run</strong></li>
+                    <li>The research store also calls a metrics summary endpoint to fetch <strong>historical aggregates</strong></li>
+                    <li>The metrics dashboard combines both to show:
+                        <ul>
+                            <li>How this run compares to historical norms</li>
+                            <li>Trends in latency, tool performance, cost, and quality</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="section-9">
+                <h2>9. Real-Time Transport Layer (WebSockets + SSE)</h2>
+
+                <p>The <strong>ConnectionManager</strong> (<code>backend/app/api/websocket.py</code>) abstracts all real-time delivery:</p>
+
+                <ul>
+                    <li>Maintains active WebSocket connections per session</li>
+                    <li>Maintains SSE (Server-Sent Events) subscribers per session</li>
+                    <li>Keeps message queues for sessions with temporarily no listeners</li>
+                    <li>Provides helper methods to send trace events, completion events, progress updates, and errors</li>
+                </ul>
+
+                <h3>Frontend connections:</h3>
+                <ul>
+                    <li>Start with WebSockets (<code>/ws/{session_id}</code>)</li>
+                    <li>If repeated WebSocket failures occur, fall back to SSE (<code>/ws/{session_id}/stream</code>)</li>
+                    <li>Both transports ultimately deliver the same JSON event shape</li>
+                </ul>
+            </section>
+
+            <section id="section-10">
+                <h2>10. Frontend Architecture Overview</h2>
+
+                <p>Key frontend elements (<code>frontend/src</code>):</p>
+
+                <h3>Main page</h3>
+                <ul>
+                    <li><code>app/page.tsx</code> (ResearchPage) – Composes Header, QueryInput, WorkflowChart, ReactTraceTimeline, ResearchOutputPanel, MetricsDashboard</li>
+                </ul>
+
+                <h3>Components</h3>
+                <ul>
+                    <li><code>components/research/react-trace-timeline.tsx</code> – ReAct trace timeline</li>
+                    <li><code>components/workflow/WorkflowChart.tsx</code> – workflow chart</li>
+                    <li><code>components/research/research-output-panel.tsx</code> – report display and export</li>
+                    <li><code>components/research/metrics-dashboard.tsx</code> – current + historical metrics</li>
+                </ul>
+
+                <h3>State stores</h3>
+                <ul>
+                    <li><code>store/research-store</code> – research session, iterations, activity state, tool output summaries, report, metrics</li>
+                    <li><code>stores/workflowStore.ts</code> – workflow nodes/edges, stats, event history</li>
+                </ul>
+
+                <h3>Hooks</h3>
+                <ul>
+                    <li><code>hooks/use-websocket.ts</code> – WebSocket/SSE lifecycle + normalization of backend messages</li>
+                </ul>
+
+                <p>The frontend treats the backend as:</p>
+                <ul>
+                    <li>A small set of REST endpoints (start session, fetch history/metrics)</li>
+                    <li>A continuous event stream (WebSocket/SSE) that drives the live UI</li>
+                </ul>
+            </section>
+
+            <section id="section-11">
+                <h2>11. Real-Time Updates in the Frontend</h2>
+
+                <h3>11.1 <code>useWebSocket</code> Hook Responsibilities</h3>
+
+                <p><code>useWebSocket</code>:</p>
+                <ul>
+                    <li>Manages connection state: <code>connecting</code> → <code>connected</code> → <code>error</code> → <code>reconnecting</code></li>
+                    <li>Builds the correct WebSocket URL for a given <code>session_id</code> and base API URL</li>
+                    <li>Normalizes raw server messages into <code>ResearchUpdate</code> objects with: <code>type</code>, <code>sessionId</code>, <code>iteration</code>, <code>data</code>, <code>timestamp</code>, <code>message</code></li>
+                    <li>Dispatches updates to:
+                        <ul>
+                            <li>The <strong>research store</strong> (iterations, activity state, report, metrics, errors)</li>
+                            <li>The <strong>workflow store</strong> (for supported workflow event types)</li>
+                        </ul>
+                    </li>
+                    <li>Implements reconnection and WebSocket ↔ SSE fallback</li>
+                </ul>
+
+                <h3>11.2 Activity State and Progress</h3>
+
+                <p>The research store maintains an <code>activityState</code> with:</p>
+
+                <ul>
+                    <li><code>currentPhase</code> – one of <code>starting</code>, <code>thinking</code>, <code>acting</code>, <code>observing</code>, <code>evaluating</code>, <code>complete</code>, <code>failed</code></li>
+                    <li><code>currentIteration</code> – best guess at the current iteration</li>
+                    <li><code>currentActivity</code> – human-readable sentence describing what's happening</li>
+                    <li><code>progress</code> – a 0–100 number derived from iteration number vs max iterations and phase within an iteration</li>
+                    <li><code>elapsed</code> and <code>estimatedTimeRemaining</code> – derived from timestamps</li>
+                </ul>
+
+                <p><code>useWebSocket</code> updates this state based on event types (e.g., <code>thought</code> → <code>thinking</code>, <code>tool_execution</code> → <code>observing</code>, <code>completion</code> → <code>complete</code>). This activity state is used in the center panel and indirectly reflected in the workflow chart progress bar.</p>
+            </section>
+
+            <section id="section-12">
+                <h2>12. ReAct Trace Timeline: Iteration View</h2>
+
+                <p>The ReAct trace timeline (<code>ReactTraceTimeline</code>) renders a list of <code>Iteration</code> objects with four main phases:</p>
+
+                <ul>
+                    <li><strong>THOUGHT</strong> – reasoning text, tokens, latency</li>
+                    <li><strong>ACTION</strong> – tool name and parameters</li>
+                    <li><strong>EXECUTION</strong> – tool result summary, duration, result count, success/failure</li>
+                    <li><strong>OBSERVATION</strong> – the agent's interpretation of the tool output</li>
+                </ul>
+
+                <h3>Backend → frontend mapping:</h3>
+                <ul>
+                    <li><code>iteration_start</code> – creates or resets an iteration entry and marks it <code>thinking</code></li>
+                    <li><code>thought</code> / <code>thought_generated</code> – fills the THOUGHT block and keeps status <code>thinking</code></li>
+                    <li><code>action</code> / <code>action_executing</code> – fills tool name and parameters, marks status <code>acting</code></li>
+                    <li><code>tool_execution</code> / <code>action_complete</code> – fills EXECUTION details, marks status <code>observing</code></li>
+                    <li><code>observation</code> / <code>observation_generated</code> – fills OBSERVATION text and marks iteration <code>complete</code></li>
+                    <li><code>finish</code> – ensures there is a final iteration and records a pseudo-tool <code>finish</code> with a summary of report synthesis</li>
+                </ul>
+
+                <p>The timeline is primarily driven by logic in <code>handleResearchUpdate</code> inside <code>use-websocket.ts</code>, which mutates the iteration list in the research store.</p>
+            </section>
+
+            <section id="section-13">
+                <h2>13. Workflow Chart: Node and Edge States</h2>
+
+                <p>The workflow chart visualizes the ReAct + evaluation process as a state machine over nodes and edges.</p>
+
+                <h3>13.1 Nodes and Their Meaning</h3>
+
+                <ul>
+                    <li><code>start</code> – conceptual entry point before ReAct begins</li>
+                    <li><code>think</code> – LLM reasoning step (THOUGHT)</li>
+                    <li><code>operate</code> – tool selection and execution (ACTION + EXECUTION)</li>
+                    <li><code>reflect</code> – interpretation and loop/finish decision</li>
+                    <li><code>evaluator</code> – end-to-end quality review</li>
+                    <li><code>finish</code> – finalization of the run (report + evaluation)</li>
+                </ul>
+
+                <p>Each node includes:</p>
+                <ul>
+                    <li><code>status</code> – <code>idle</code>, <code>active</code>, <code>completed</code>, <code>error</code>, <code>skipped</code></li>
+                    <li><code>visitCount</code> and <code>currentVisitIteration</code> – how often this stage was visited</li>
+                    <li><code>metadata</code> – rich details (thought, tool, provider, observation, evaluation scores, report length, etc.)</li>
+                </ul>
+
+                <h3>13.2 Edges and Looping</h3>
+
+                <p>Edges represent flow:</p>
+
+                <h4>Forward path:</h4>
+                <ul>
+                    <li><code>start→think</code></li>
+                    <li><code>think→operate</code></li>
+                    <li><code>operate→reflect</code></li>
+                    <li><code>reflect→evaluator</code></li>
+                    <li><code>evaluator→finish</code></li>
+                </ul>
+
+                <h4>Loop path:</h4>
+                <ul>
+                    <li><code>reflect→think</code> for additional iterations</li>
+                </ul>
+
+                <p>Edges track:</p>
+                <ul>
+                    <li><code>status</code> – <code>idle</code>, <code>active</code>, <code>completed</code>, <code>disabled</code></li>
+                    <li><code>showFlowAnimation</code>, <code>showPulse</code> – used by SVG animations</li>
+                    <li><code>transitionCount</code> – number of times a path was taken</li>
+                </ul>
+
+                <h3>13.3 How Events Drive the Workflow Store</h3>
+
+                <p>The <code>workflowReducer</code> consumes <code>WorkflowEvent</code> objects (derived from backend events):</p>
+
+                <ul>
+                    <li><code>session_start</code> – resets state, sets max iterations</li>
+                    <li><code>iteration_start</code> – activates THINK node and either <code>start→think</code> or <code>reflect→think</code> depending on iteration</li>
+                    <li><code>thought</code> – marks THINK completed, activates OPERATE and <code>think→operate</code></li>
+                    <li><code>action</code> – records selected tool in OPERATE metadata</li>
+                    <li><code>tool_execution</code> – marks OPERATE completed or errored, activates REFLECT and <code>operate→reflect</code> when successful</li>
+                    <li><code>observation</code> – stores observation text in REFLECT metadata</li>
+                    <li><code>finish_guard</code> – either loops (activate <code>reflect→think</code>) or moves forward (activate <code>reflect→evaluator</code>)</li>
+                    <li><code>finish</code> – completes THINK/OPERATE/REFLECT and records pending finish metadata</li>
+                    <li><code>evaluator_start</code> – activates EVALUATOR node and <code>reflect→evaluator</code> edge</li>
+                    <li><code>evaluator_complete</code> – completes EVALUATOR and FINISH nodes and <code>evaluator→finish</code> edge</li>
+                    <li><code>error</code> – marks the currently active node as error</li>
+                    <li><code>session_complete</code> – records duration, total tokens, and cost in stats</li>
+                </ul>
+
+                <p><code>WorkflowChart</code> then renders this state into SVG nodes/edges and a progress bar based on iteration and stage completion.</p>
+            </section>
+
+            <section id="section-14">
+                <h2>14. Backend–Frontend Mapping Reference</h2>
+
+                <p>This table summarizes how backend events flow into frontend visualizations:</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Backend source</th>
+                            <th>Event type</th>
+                            <th>Frontend effects</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>ResearcherAgent._emit_trace("session_start")</code></td>
+                            <td><code>session_start</code></td>
+                            <td>Workflow reset + THINK entry; activity state set to "Session started"</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("iteration_start")</code></td>
+                            <td><code>iteration_start</code></td>
+                            <td>New iteration created; THINK node active; start→think or reflect→think edge animated</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("thought")</code></td>
+                            <td><code>thought</code></td>
+                            <td>THOUGHT block populated; THINK node completed; OPERATE node active; think→operate edge flows</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("action")</code></td>
+                            <td><code>action</code></td>
+                            <td>ACTION block populated; OPERATE metadata updated</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("tool_execution")</code></td>
+                            <td><code>tool_execution</code></td>
+                            <td>EXECUTION block populated; OPERATE→REFLECT transition; stats updated</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("observation")</code></td>
+                            <td><code>observation</code></td>
+                            <td>OBSERVATION block populated; REFLECT metadata updated</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("finish_guard")</code></td>
+                            <td><code>finish_guard</code></td>
+                            <td>REFLECT decision set; either loop (reflect→think) or progress (reflect→evaluator)</td>
+                        </tr>
+                        <tr>
+                            <td><code>_emit_trace("finish")</code></td>
+                            <td><code>finish</code></td>
+                            <td>Final iteration recorded; THINK/OPERATE/REFLECT completed; pending FINISH metadata stored</td>
+                        </tr>
+                        <tr>
+                            <td><code>_run_research_session</code> emits evaluator_start</td>
+                            <td><code>evaluator_start</code></td>
+                            <td>EVALUATOR node active; reflect→evaluator edge animated</td>
+                        </tr>
+                        <tr>
+                            <td><code>_run_research_session</code> emits evaluator_complete</td>
+                            <td><code>evaluator_complete</code></td>
+                            <td>EVALUATOR + FINISH nodes completed; evaluator→finish edge completed; scores shown</td>
+                        </tr>
+                        <tr>
+                            <td><code>_run_research_session</code> emits completion payload</td>
+                            <td><code>completion</code></td>
+                            <td>Report + metrics stored; metrics dashboard updated; activity state "complete"</td>
+                        </tr>
+                        <tr>
+                            <td>Error in <code>_run_research_session</code> or tools</td>
+                            <td><code>error</code></td>
+                            <td>Active node marked error; error banner shown; activity state "failed"</td>
+                        </tr>
+                        <tr>
+                            <td>Session explicitly marked failed</td>
+                            <td><code>session_failed</code></td>
+                            <td>Session history updated; activity state "failed"; error state persisted</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="section-15">
+                <h2>15. Error Handling, Cancellation, and Resilience</h2>
+
+                <h3>15.1 Cancellation</h3>
+
+                <p><code>POST /api/research/{session_id}/cancel</code>:</p>
+                <ul>
+                    <li>Verifies the session is <code>running</code></li>
+                    <li>Sets <code>_active_sessions[session_id] = False</code></li>
+                    <li>Updates DB status to <code>cancelled</code></li>
+                </ul>
+
+                <p>The ReAct loop periodically checks whether the session is still active and exits early if not.</p>
+
+                <h4>Frontend effects:</h4>
+                <ul>
+                    <li>"Stop Research" button triggers the cancel endpoint</li>
+                    <li>No further live events arrive after cancellation is processed</li>
+                    <li>The UI shows a non-completed session with partial trace and no evaluator/metrics</li>
+                </ul>
+
+                <h3>15.2 Error Handling</h3>
+
+                <p>Exceptions in <code>_run_research_session</code> are caught:</p>
+                <ul>
+                    <li><code>websocket_manager.send_error(...)</code> sends an <code>error</code> event with message and type</li>
+                    <li>Session status is updated to <code>failed</code> with a completion timestamp</li>
+                </ul>
+
+                <p>Tool-level timeouts/errors are surfaced via <code>tool_execution</code> (with <code>success=false</code>) and may also generate <code>error</code> events.</p>
+
+                <h4>Frontend effects:</h4>
+                <ul>
+                    <li><code>useWebSocket</code> sets an error message in the research store and marks researching as <code>false</code></li>
+                    <li>Workflow store marks the currently active node as <code>error</code> with an error message</li>
+                    <li>Activity state switches to <code>failed</code></li>
+                </ul>
+
+                <h3>15.3 Transport Resilience</h3>
+
+                <h4>WebSockets:</h4>
+                <ul>
+                    <li>On close/error, <code>useWebSocket</code> attempts reconnection with increasing delay, up to a configured maximum</li>
+                    <li>After too many failures, it switches to SSE</li>
+                </ul>
+
+                <h4>SSE:</h4>
+                <ul>
+                    <li>On repeated errors, SSE also gives up and the hook cycles back to WebSockets</li>
+                </ul>
+
+                <p>This design minimizes the chance that long-running sessions lose their visual trace due to transient network problems.</p>
+            </section>
+
+            <section id="section-16">
+                <h2>16. Extensibility and Future Enhancements</h2>
+
+                <p>The architecture is intended to be extended in three main directions:</p>
+
+                <h3>New tools</h3>
+                <ul>
+                    <li>Implement tool logic under <code>app/tools</code></li>
+                    <li>Add tool definitions in <code>definitions.py</code> so the ReAct prompt and tool schema include it</li>
+                    <li>Emit standard <code>action</code> / <code>tool_execution</code> events with the new tool name</li>
+                    <li>Frontend will automatically show it in ACTION/EXECUTION blocks (and you can customize labels if desired)</li>
+                </ul>
+
+                <h3>New LLM providers or models</h3>
+                <ul>
+                    <li>Implement a new provider class following <code>BaseLLMProvider</code></li>
+                    <li>Register it in <code>LLMManager</code> and extend configuration</li>
+                    <li>Add it to <code>VALID_MODEL_OVERRIDES</code> in <code>routes/research.py</code> if you want user-facing model overrides</li>
+                </ul>
+
+                <h3>Richer workflows and traces</h3>
+                <ul>
+                    <li>Add new event types to <code>_emit_trace</code> and to the frontend <code>WebSocketEventType</code> union</li>
+                    <li>Extend <code>workflowStore</code>'s event union and reducer to interpret new stages</li>
+                    <li>Add nodes or edges to the workflow chart (e.g., separate PLAN/SYNTHESIZE/CRITIQUE nodes)</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong>Clean Separation</strong>
+                    Because the system cleanly separates:
+                    <ul style="margin-top: 0.75rem;">
+                        <li><strong>Agent reasoning and tool orchestration</strong> (backend agents)</li>
+                        <li><strong>Transport and persistence</strong> (API, DB, WebSockets/SSE, traces, metrics)</li>
+                        <li><strong>Visualization</strong> (frontend stores and React components)</li>
+                    </ul>
+                    <p style="margin-top: 0.75rem;">You can evolve each layer independently while keeping the overall mental model the same: a transparent, measurable ReAct-style research loop followed by an end-to-end AI evaluation.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Agentic Research Lab – Application Architecture Documentation</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Generated from app_architecture.md</p>
+        </footer>
+    </div>
+</body>
+</html>

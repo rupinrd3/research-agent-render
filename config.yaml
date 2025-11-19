@@ -1,0 +1,148 @@
+# Agentic AI Research Solution Configuration
+
+# LLM Provider Settings
+#
+# IMPORTANT: Set API keys in .env file for the providers you want to use:
+#   - OPENAI_API_KEY=sk-...
+#   - GOOGLE_API_KEY=...
+#   - OPENROUTER_API_KEY=sk-or-...
+#
+# The system will automatically use the first available provider if the
+# primary provider's API key is not configured.
+#
+# Provider Compatibility:
+#   - openai: Most reliable, full function calling support (recommended)
+#   - gemini: Fast and cost-effective, function calling supported
+#   - openrouter: Access to various models, function calling varies by model
+llm:
+  primary: "openrouter"  # Preferred provider: openai, gemini, or openrouter
+  fallback_order: ["openai", "gemini"]  # Fallback sequence
+
+  # OpenAI Configuration
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-4o-mini"  # Fast, low-cost default
+    temperature: 0.7
+
+  # Google Gemini Configuration
+  gemini:
+    api_key: "${GOOGLE_API_KEY}"
+    model: "gemini-2.5-flash"  # Options: gemini-2.5-flash, gemini-2.5-pro, gemini-2.0-flash
+    temperature: 0.7
+    max_tokens: 8000
+
+  # OpenRouter Configuration (multi-model via OpenRouter free tier)
+  openrouter:
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+    alternate_models:
+      - "minimax/minimax-m2:free"
+      - "meta-llama/llama-3.3-70b-instruct:free"
+      - "deepseek/deepseek-r1-0528:free"
+    temperature: 0.7
+    max_tokens: 8000
+
+# Research Execution Settings
+research:
+  max_iterations: 10  # Maximum ReAct iterations
+  timeout_minutes: 15  # Timeout for complete research session
+  parallel_tool_execution: false  # Execute tools in parallel (experimental)
+  finish_guard_enabled: true
+  finish_guard_retry_on_auto_finish: true
+  sparse_result_threshold: 2
+  sufficient_result_count: 5
+  ascii_prompts: true
+
+# Research Tools Configuration
+tools:
+  # Web search now uses automatic provider failover: Tavily -> Serper -> SerpAPI
+  # No need to specify provider - system automatically tries in order
+  web_search_max_results: 10
+  web_search_timeout_seconds: 90  # Total timeout across all providers
+  tool_execution_timeout_seconds: 60  # Safety timeout per tool invocation
+  
+  use_content_pipeline: true  # Advanced content processing (experimental)
+  pipeline_top_k: 10  # Number of top results to select
+  pipeline_cache_ttl: 15  # Cache TTL in minutes
+
+  # Search provider API keys (loaded from .env)
+  tavily_api_key: "${TAVILY_API_KEY}"
+  serper_api_key: "${SERPER_API_KEY}"
+  serpapi_api_key: "${SERPAPI_API_KEY}"
+
+  # Other tool settings
+  arxiv_max_results: 20
+  github_max_results: 10
+  github_token: "${GITHUB_TOKEN}"
+  pdf_max_pages: 50
+
+# Evaluation Settings
+evaluation:
+  run_per_step: false  # Per-step evaluation REMOVED
+  run_end_to_end: true  # End-to-end evaluation only (0-1 scale, 4 metrics)
+  llm_as_judge: true  # Use LLM for evaluation
+
+# Enhanced Evaluation - DEPRECATED (features removed)
+enable_hallucination_detection: false
+enable_contradiction_detection: false
+enable_confidence_scoring: false
+enable_quality_tier_classification: false
+
+# Tracing & Observability
+tracing:
+  enabled: true
+  provider: "custom"  # "langsmith" or "custom"
+  langsmith_api_key: "${LANGSMITH_API_KEY}"  # Optional, only if using LangSmith
+  langsmith_project: "agentic-research"
+  log_tool_outputs: true
+  log_llm_calls: true
+  log_level: "info"  # debug, info, warning, error
+
+# Database Configuration
+# For production (Render), set DATABASE_URL environment variable
+# For local development, uses SQLite by default
+database:
+  url: "${DATABASE_URL:sqlite+aiosqlite:///./research.db}"
+  echo: false
+
+# API Server Settings
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  cors_origins:
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+    - "https://*.onrender.com"  # Allow all Render deployments
+
+# Metrics Collection
+metrics:
+  enabled: true
+  collect_tool_metrics: true
+  collect_llm_metrics: true
+  collect_source_metrics: true
+
+# Export Settings
+export:
+  default_format: "markdown"
+  include_metadata: true
+  include_evaluation: true
+  pdf_template: "default"
+
+# Advanced Settings
+advanced:
+  # Content Processing
+  max_content_length: 5000  # Max content length for summarization
+  summary_length: 200  # Target summary length in words
+
+  # Caching
+  enable_redis: false  # Use Redis for distributed caching (requires Redis server)
+  redis_url: "redis://localhost:6379"
+
+  # Rate Limiting (Future)
+  enable_rate_limiting: false
+  requests_per_minute: 60
+
+  # Security (Future)
+  enable_api_key_auth: false
+  require_https: false
