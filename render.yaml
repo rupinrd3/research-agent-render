@@ -55,11 +55,10 @@ services:
         value: 18.17.0
       - key: PORT
         generateValue: true
+      # Set this AFTER backend is deployed with the backend URL
+      # Format: https://research-agent-backend.onrender.com
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          type: web
-          name: research-agent-backend
-          property: hostport
+        sync: false
 
 databases:
   # PostgreSQL Database (Free tier - 30 days only!)
