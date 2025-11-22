@@ -49,6 +49,7 @@ export interface SessionMetadata {
 export interface Iteration {
   id: string;
   index: number;
+  mode?: 'normal' | 'auto_finish';
   status: IterationStatus;
   thought: Thought;
   action: Action;

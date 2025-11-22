@@ -116,9 +116,12 @@ interface IterationCardProps {
 }
 
 function IterationCard({ iteration, index, isExpanded, onToggle }: IterationCardProps) {
-  const displayIndex = typeof iteration.index === 'number' && iteration.index > 0
+  const numericIndex = typeof iteration.index === 'number' && iteration.index > 0
     ? iteration.index
     : index + 1;
+  const isAutoFinish = iteration.mode === 'auto_finish';
+  const displayToken = isAutoFinish ? 'AF' : numericIndex;
+  const title = isAutoFinish ? 'Final Report (Auto-Finish)' : `Iteration ${numericIndex}`;
   const isComplete = iteration.status === 'complete';
   const isFailed = iteration.status === 'failed';
   const isActive = !isComplete && !isFailed;
@@ -152,10 +155,10 @@ function IterationCard({ iteration, index, isExpanded, onToggle }: IterationCard
                 isFailed && 'bg-red-500/15 text-red-300'
               )}
             >
-              {isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : displayIndex}
+              {isActive ? <Loader2 className="w-4 h-4 animate-spin" /> : displayToken}
             </div>
             <div>
-              <span className="font-medium text-slate-100">Iteration {displayIndex}</span>
+              <span className="font-medium text-slate-100">{title}</span>
               {isComplete && (
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 inline ml-2" />
               )}

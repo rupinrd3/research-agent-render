@@ -511,6 +511,15 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                                     },
                                     iteration,
                                 )
+                                await self._emit_trace(
+                                    "observation",
+                                    {
+                                        "observation": rejection[:1000],
+                                        "index": idx,
+                                        "message": self._shorten(rejection, 400),
+                                    },
+                                    iteration,
+                                )
                                 conversation_history.append(
                                     {
                                         "role": "tool",
@@ -527,6 +536,16 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                                                 "Finish guard guidance: "
                                                 f"{guard_hint} Use the most relevant tool to close the gap."
                                             ),
+                                        }
+                                    )
+                                if self.metrics_collector and idx == 0:
+                                    self.metrics_collector.add_iteration(
+                                        {
+                                            "iteration": iteration,
+                                            "duration": step_latency,
+                                            "timestamp": datetime.utcnow().isoformat(),
+                                            "thought": thought[:200],
+                                            "action": "finish_guard_rejected",
                                         }
                                     )
                                 continue
@@ -574,6 +593,17 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                                 latency_seconds=step_latency,
                             )
                             steps.append(finish_step)
+
+                            if self.metrics_collector:
+                                self.metrics_collector.add_iteration(
+                                    {
+                                        "iteration": iteration,
+                                        "duration": step_latency,
+                                        "timestamp": datetime.utcnow().isoformat(),
+                                        "thought": thought[:200],
+                                        "action": "finish",
+                                    }
+                                )
 
                             logger.info("Agent finished research")
                             logger.info("[Lifecycle] Generates Report and cites %s sources", len(sources))
@@ -993,6 +1023,7 @@ Approve only if the report covers the query, cites authoritative sources, and ad
         logger.warning(
             "Max iterations reached without finish; generating final report automatically."
         )
+        auto_start = time.time()
         await self._emit_trace("iteration_start", {
             "iteration": iteration,
             "timestamp": datetime.utcnow().isoformat(),
@@ -1083,6 +1114,18 @@ Approve only if the report covers the query, cites authoritative sources, and ad
             "sources": sources,
             "message": self._shorten("Auto-finish generated the final report", 400),
         }, iteration)
+
+        if self.metrics_collector:
+            auto_duration = time.time() - auto_start
+            self.metrics_collector.add_iteration(
+                {
+                    "iteration": iteration,
+                    "duration": auto_duration,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "thought": thought[:200],
+                    "action": "auto_finish",
+                }
+            )
 
         step = AgentStep(
             iteration=iteration,

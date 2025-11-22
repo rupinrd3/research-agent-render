@@ -229,10 +229,15 @@ export function useWebSocket(options: UseWebSocketOptions): UseWebSocketReturn {
     return Math.max(0, Math.round((timestamp.getTime() - start.getTime()) / 1000));
   };
 
-  const ensureIterationEntry = (iterationNumber: number, timestamp: Date) => {
+  const ensureIterationEntry = (iterationNumber: number, timestamp: Date, mode?: string) => {
     const normalizedNumber = iterationNumber > 0 ? iterationNumber : 1;
     const existing = iterationMapRef.current[normalizedNumber];
+    const store = storeRef.current;
+    const normalizedMode = mode === 'auto_finish' ? 'auto_finish' : 'normal';
     if (existing) {
+      if (normalizedMode === 'auto_finish') {
+        store.updateIteration(existing, { mode: normalizedMode });
+      }
       return existing;
     }
     const iterationId = `${sessionId || 'session'}-iter-${normalizedNumber}`;
@@ -240,6 +245,7 @@ export function useWebSocket(options: UseWebSocketOptions): UseWebSocketReturn {
     const baseIteration: Iteration = {
       id: iterationId,
       index: normalizedNumber,
+      mode: normalizedMode,
       status: 'pending',
       thought: {
         content: '',
@@ -261,7 +267,7 @@ export function useWebSocket(options: UseWebSocketOptions): UseWebSocketReturn {
       duration: 0,
       timestamp,
     };
-    storeRef.current.addIteration(baseIteration);
+    store.addIteration(baseIteration);
     return iterationId;
   };
 
@@ -340,17 +346,22 @@ export function useWebSocket(options: UseWebSocketOptions): UseWebSocketReturn {
 
       case 'iteration_start': {
         if (update.iteration !== undefined) {
-          const iterationId = ensureIterationEntry(update.iteration, timestamp);
+          const mode = update.data?.mode as string | undefined;
+          const iterationId = ensureIterationEntry(update.iteration, timestamp, mode);
           iterationStartRef.current[update.iteration] = timestamp.getTime();
           store.updateIteration(iterationId, {
             status: 'thinking',
             timestamp,
           });
+          const iterationLabel =
+            mode === 'auto_finish'
+              ? 'Auto-finish final report'
+              : `Starting iteration ${update.iteration}`;
           publish(
             'thinking',
             update.iteration,
-            `Starting iteration ${update.iteration}`,
-            update.message ?? `Starting iteration ${update.iteration}`,
+            iterationLabel,
+            update.message ?? iterationLabel,
           );
         }
         break;
