@@ -38,7 +38,7 @@ You need to push your code to a GitHub repository.
 
 ```bash
 # Navigate to your hosting folder
-cd D:\research_agent_claude\agent\hosting
+cd D:\research_agent\agent\hosting
 
 # Initialize git repository
 git init
@@ -392,7 +392,7 @@ Render automatically deploys when you push to your main branch:
 
 ```bash
 # Make changes locally
-cd D:\research_agent_claude\agent\hosting
+cd D:\research_agent\agent\hosting
 
 # Commit and push
 git add .
@@ -565,7 +565,7 @@ Users can now access your application at your frontend URL. Remember to monitor 
   📋 What You Need to Do Next
 
   1. Push to GitHub (if not already):
-  cd D:\research_agent_claude\agent\hosting
+  cd D:\research_agent\agent\hosting
   git init
   git add .
   git commit -m "Ready for Render deployment"

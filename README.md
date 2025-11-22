@@ -256,7 +256,7 @@ Display Results + Metrics Dashboard
 ## 📁 Project Structure
 
 ```
-research_agent_claude/
+research_agent/
 ├── backend/                       # Python FastAPI backend
 │   ├── app/
 │   │   ├── agents/               # ReAct agent & evaluator implementations
@@ -345,7 +345,6 @@ research_agent_claude/
 ├── start.bat / start.sh          # Start scripts
 ├── stop.bat                      # Stop script (Windows)
 ├── GETTING_STARTED.md            # Quick start guide
-├── CLAUDE.md                     # Developer guide for Claude Code
 └── README.md                     # This file
 ```
 
@@ -368,7 +367,7 @@ research_agent_claude/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd research_agent_claude
+   cd research_agent
    ```
 
 2. **Set up environment variables**
@@ -418,7 +417,7 @@ research_agent_claude/
 ```bash
 # Clone repository
 git clone <repository-url>
-cd research_agent_claude
+cd research_agent
 
 # Set up environment
 cp .env.example .env
@@ -1047,7 +1046,6 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 📞 Support
 
-- **Documentation**: See `GETTING_STARTED.md` and `CLAUDE.md`
 - **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
 
