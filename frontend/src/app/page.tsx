@@ -110,14 +110,6 @@ export default function ResearchPage() {
     const sectionsMarkdown = orderedSections
       .map((section) => `## ${section.title}\n\n${section.content}`)
       .join('\n\n');
-    const sourcesMarkdown = (currentReport.sources || [])
-      .map(
-        (source, index) =>
-          `- [${index + 1}] ${source.title} (${source.url})${
-            source.type ? ` | ${source.type}` : ''
-          }`
-      )
-      .join('\n');
 
     const metadata = currentReport.metadata
       ? `\n\n_Generated in ${Math.round(
@@ -129,9 +121,7 @@ export default function ResearchPage() {
 
     return `# ${currentReport.title}\n\n## Executive Summary\n${
       currentReport.executiveSummary
-    }\n\n${sectionsMarkdown}\n\n## Sources\n${
-      sourcesMarkdown || 'No sources provided.'
-    }\n${metadata}`;
+    }\n\n${sectionsMarkdown}\n${metadata}`;
   };
 
   /**
