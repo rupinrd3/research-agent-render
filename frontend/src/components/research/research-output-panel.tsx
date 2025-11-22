@@ -87,7 +87,7 @@ export function ResearchOutputPanel({
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 overflow-y-auto h-[calc(100%-140px)] scrollbar-thin text-white">
+      <CardContent className="p-6 overflow-y-auto h-[calc(100%-120px)] scrollbar-thin text-white">
         {report ? (
           <ReportContent report={report} />
         ) : (
