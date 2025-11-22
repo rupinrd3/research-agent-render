@@ -190,7 +190,7 @@ export default function ResearchPage() {
           )}
 
           {/* Two-Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[700px] max-h-[calc(100vh-380px)] animate-in fade-in duration-300">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 min-h-[800px] animate-in fade-in duration-300">
             {/* Left Panel: ReAct Trace Timeline */}
             <div className="h-full">
               <ReactTraceTimeline iterations={iterations} />

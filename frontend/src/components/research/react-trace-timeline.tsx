@@ -78,7 +78,7 @@ export function ReactTraceTimeline({ iterations, className }: ReactTraceTimeline
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 overflow-y-auto h-[calc(100%-100px)] scrollbar-thin">
+      <CardContent className="p-4 overflow-y-auto h-[calc(100%-80px)] scrollbar-thin">
         <div className="space-y-4">
           {iterations.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
