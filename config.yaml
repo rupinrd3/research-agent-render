@@ -15,8 +15,8 @@
 #   - gemini: Fast and cost-effective, function calling supported
 #   - openrouter: Access to various models, function calling varies by model
 llm:
-  primary: "openrouter"  # Preferred provider: openai, gemini, or openrouter
-  fallback_order: ["openai", "gemini"]  # Fallback sequence
+  primary: "openai"  # Preferred provider: openai, gemini, or openrouter
+  fallback_order: ["gemini", "openrouter"]  # Fallback sequence
 
   # OpenAI Configuration
   openai:
