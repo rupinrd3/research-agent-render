@@ -140,7 +140,6 @@ Guidelines:
   - Implementation / Impact (deployments, costs, adoption, code-level insights) when relevant.
   - Risks, Gaps & Open Questions.
   - Recommended Next Steps (clear actions or experiments).
-  - Sources: numbered list matching inline [#] citations plus any optional appendices (tables, glossaries) that aid comprehension.
 - Use at least five diverse sources whenever feasible, mixing official/primary materials, journalistic reporting, and analytical perspectives. For political or social topics, seek geographic and ideological diversity.
 - Summaries must stay flexible: write for both technical and general readers by mixing crisp paragraphs with occasional bullet lists when that improves clarity.
 
@@ -1093,7 +1092,7 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                 "You have reached the iteration limit. Using only the observations gathered so far, "
                 "call the finish tool now and generate the Deep Research Report. "
                 "Required structure: Title, TL;DR (4-6 bullets), Methodology & Evidence Quality, dynamic Findings & Analysis sections (### ... tailored to the query), "
-                "Implementation / Impact, Risks & Open Questions, Recommended Next Steps, Sources. "
+                "Implementation / Impact, Risks & Open Questions, Recommended Next Steps. "
                 "Blend retrieved evidence with trusted background context, cite sources inline as [#], and adapt headings if the topic demands. "
                 "Do NOT call any other tools."
             ),
