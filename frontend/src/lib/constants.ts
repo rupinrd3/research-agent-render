@@ -7,8 +7,23 @@ import type { ExampleQuery } from '@/types';
 /**
  * API endpoints
  */
+const getApiUrl = () => {
+  // Use environment variable if set
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  // Auto-detect production backend URL
+  if (typeof window !== 'undefined' && window.location.hostname === 'research-agent-frontend-dp8e.onrender.com') {
+    return 'https://research-agent-backend-dp8e.onrender.com';
+  }
+
+  // Default to localhost for development
+  return 'http://localhost:8000';
+};
+
 export const API_ENDPOINTS = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  BASE_URL: getApiUrl(),
   WS_URL: process.env.NEXT_PUBLIC_WS_URL || '',
   RESEARCH: '/api/research',
   HISTORY: '/api/history',
