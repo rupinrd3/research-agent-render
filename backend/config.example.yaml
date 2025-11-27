@@ -12,7 +12,7 @@ llm:
   # OpenAI Configuration
   openai:
     api_key: "${OPENAI_API_KEY}"  # Set via environment variable
-    model: "gpt-5-mini-2025-08-07"  # Options: gpt-4o-mini, gpt-4o, gpt-4-turbo
+    model: "gpt-4.1-mini"  # Options: gpt-4.1-mini, gpt-5-mini, gpt-5-nano, gpt-4o, gpt-4-turbo
     temperature: 0.7
     max_tokens: 2000
 
@@ -36,7 +36,7 @@ llm:
 
 # Research Settings
 research:
-  max_iterations: 10  # Maximum ReAct iterations per session
+  max_iterations: 7  # Maximum ReAct iterations per session
   timeout_minutes: 15  # Session timeout
   parallel_tool_execution: false  # Execute tools in parallel (experimental)
 

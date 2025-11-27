@@ -82,10 +82,10 @@ export const EXAMPLE_QUERIES: ExampleQuery[] = [
  * Default settings
  */
 export const DEFAULT_SETTINGS = {
-  llmProvider: 'openrouter' as const,
-  llmModel: 'nvidia/llama-3.3-nemotron-super-49b-v1.5',
+  llmProvider: 'openai' as const,
+  llmModel: 'gpt-4.1-mini',
   temperature: 0.7,
-  maxIterations: 10,
+  maxIterations: 7,
   apiKeys: {
     openai: '',
     gemini: '',
@@ -238,7 +238,20 @@ export const EXPORT_FORMATS = [
  * LLM Provider options
  */
 export const LLM_PROVIDERS = [
-  { value: 'openai', label: 'OpenAI', models: ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'] },
+  {
+    value: 'openai',
+    label: 'OpenAI',
+    models: [
+      'gpt-4.1-mini',
+      'gpt-4o-mini',
+      'gpt-4o',
+      'gpt-4-turbo',
+      'gpt-3.5-turbo',
+      'gpt-5-nano',
+      'gpt-5-mini',
+      'gpt-5.1',
+    ],
+  },
   { value: 'gemini', label: 'Google Gemini', models: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-1.5-pro'] },
   {
     value: 'openrouter',
@@ -263,4 +276,4 @@ export const PAGINATION = {
 /**
  * Persisted settings schema version
  */
-export const SETTINGS_VERSION = 3;
+export const SETTINGS_VERSION = 4;

@@ -45,10 +45,14 @@ logger.setLevel(logging.INFO)
 
 VALID_MODEL_OVERRIDES: Dict[str, Set[str]] = {
     "openai": {
+        "gpt-4.1-mini",
         "gpt-4o-mini",
         "gpt-4o",
         "gpt-4-turbo",
         "gpt-3.5-turbo",
+        "gpt-5-nano",
+        "gpt-5-mini",
+        "gpt-5.1",
     },
     "gemini": {
         "gemini-2.5-flash",

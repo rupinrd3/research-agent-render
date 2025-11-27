@@ -74,6 +74,8 @@ error.txt
 create_archive.*
 *.zip
 *.tar.gz
+*.7z
+nul
 
 # Sample data
 sample_responses/
@@ -81,3 +83,15 @@ sample_responses/
 # Backup files
 *.backup
 *.bak
+
+# Claude Code configuration
+.claude/
+
+# Temporary/test files
+app.txt
+asd.md
+compare_files.py
+compare_folders.py
+
+# Backend duplicate directory (cleanup needed)
+backend/backend/

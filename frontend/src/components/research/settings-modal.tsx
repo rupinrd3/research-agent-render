@@ -216,7 +216,8 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-white/70 mt-1">
-                  {selectedProvider?.value === 'openai' && 'gpt-4o-mini is optimized for low-latency reasoning'}
+                  {selectedProvider?.value === 'openai' &&
+                    'gpt-4.1-mini is the fast default; gpt-5* uses the Responses API with enhanced reasoning.'}
                   {selectedProvider?.value === 'gemini' && 'Gemini 2.5 Flash is highly capable'}
                   {selectedProvider?.value === 'openrouter' &&
                     'Free OpenRouter tier (DeepSeek, MiniMax, Meta-Llama)'}

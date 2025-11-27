@@ -105,7 +105,7 @@ class ResearcherAgent:
 
     CURRENT_YEAR = "2025"
 
-    SYSTEM_PROMPT = """You are a senior research analyst operating with the ReAct (Reasoning + Acting) pattern.
+    SYSTEM_PROMPT = """You are a senior research analyst operating with the ReAct (Reasoning + Acting) pattern within an **Agentic AI Research System** designed for autonomous research.
 
 Loop discipline (per iteration):
 1. THOUGHT – spell out what you have learned, what is still unclear, and which data source would best close the gap. Think about what information you need next, if any.
@@ -123,21 +123,25 @@ Available tools:
 Guidelines:
 - Max iterations: {max_iterations}. Use them deliberately; batch multiple tool calls in the same action only when they are clearly warranted.
 - Always cite sources inline as [#] and maintain a numbered reference list.
+- Every factual claim, statistic, quote, or projection must include an inline [#] citation. If a value is genuinely absent in the literature, state “Not reported [#]” and cite the source confirming the gap.
 - After every observation, reflect on: "What critical questions remain? Which tool best addresses them?" If you already have all required evidence and every section of the report can be written, call `finish` instead of launching more tools.
 - Treat the content pipeline output as structured evidence: highlight why each source matters rather than copying text.
-- Use the gathered sources as primary evidence; you may layer in well-established background context from your own knowledge, but corroborate it with at least one verifiable source whenever possible.
+- Blend gathered sources with trusted prior knowledge, but cite both external data and any key background assertions. Do not dump raw source summaries; synthesize across references.
 - If a web_search returns fewer than 3 relevant results or clearly misses key subtopics, immediately refine the query (add specifics, synonyms, filters, or site/domain hints) and run web_search again before moving on.
 - When freshness matters, set the `date_filter` argument (day/week/month/year) or state "past month"/"latest" explicitly. Treat the "current year" as {current_year} unless the user explicitly asks for another year, and prefer mentioning {current_year} when you must cite recency.
 - When the topic is historical, keep the referenced years and focus on the core topic instead of recency filters.
 - Domain coverage reminders are hints, not quotas. Once you have enough credible evidence for every section, skip additional tools and call `finish`.
-- When you eventually call finish, follow the Deep Research Report spec:
+- Before drafting, decide which sections best fit the topic. TL;DR and Methodology & Evidence Quality are always required; other sections (Findings, Architecture, Policy Implications, Societal Impact, etc.) must be adapted to the domain and clearly labeled. State any custom headings you add.
+- When you eventually call finish, follow the Deep Research Report spec and ensure the total report length is at least 600 words:
   - Title + TL;DR (4-6 bullets with quantified takeaways when possible).
-  - Methodology & Evidence Quality: explain which tools/sources were used, recency filters applied, remaining blind spots, and confidence.
-  - Findings & Analysis: create domain-appropriate sections (business impact, policy implications, architecture, market sizing, etc.). Feel free to add or rename sections so the outline matches the query. Blend retrieved evidence with trustworthy prior knowledge, but cite only verifiable sources inline as [#].
+  - Methodology & Evidence Quality: explain which tools/sources were used, recency filters applied, remaining blind spots, and confidence. Include a “Coverage gaps & confidence” clause.
+  - Key Facts: provide a table or bullet list summarizing the most critical quantitative facts (specs, timelines, stakeholder impacts, etc.) tailored to the topic.
+  - Findings & Analysis: create domain-appropriate sections (business impact, policy implications, architecture, market sizing, cultural significance, etc.). Each major section should contain at least one quantified data point when available.
   - Implementation / Impact (deployments, costs, adoption, code-level insights) when relevant.
   - Risks, Gaps & Open Questions.
   - Recommended Next Steps (clear actions or experiments).
   - Sources: numbered list matching inline [#] citations plus any optional appendices (tables, glossaries) that aid comprehension.
+- Use at least five diverse sources whenever feasible, mixing official/primary materials, journalistic reporting, and analytical perspectives. For political or social topics, seek geographic and ideological diversity.
 - Summaries must stay flexible: write for both technical and general readers by mixing crisp paragraphs with occasional bullet lists when that improves clarity.
 
 Current query: {query}"""
@@ -339,6 +343,7 @@ Approve only if the report covers the query, cites authoritative sources, and ad
 
                 try:
                     # Add user prompt if needed
+                    self._ensure_tool_call_outputs(conversation_history)
                     self._prune_incomplete_tool_calls(conversation_history)
 
                     if len(conversation_history) > 1 and conversation_history[-1]["role"] != "user":
@@ -635,6 +640,23 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                                 "tool": action_name,
                                 "notes": [timeout_message],
                             }
+                        except Exception as exc:
+                            tool_success = False
+                            timeout_message = (
+                                f"Tool '{action_name}' failed: {exc}"
+                            )
+                            logger.error(
+                                "[ResearcherAgent] Tool '%s' failed with error: %s",
+                                action_name,
+                                exc,
+                                exc_info=True,
+                            )
+                            tool_output = {
+                                "status": "error",
+                                "error": str(exc),
+                                "tool": action_name,
+                                "notes": [str(exc)],
+                            }
 
                         tool_duration = time.time() - tool_start
 
@@ -864,6 +886,40 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                 history.pop()
                 continue
             break
+
+    def _ensure_tool_call_outputs(self, history: List[Dict[str, Any]]) -> None:
+        """
+        Ensure every assistant tool_call has a corresponding tool response message.
+
+        If any tool_call is missing a tool message, append a synthetic error response so
+        downstream LLM calls (e.g., GPT-5 Responses API) see a matching function_call_output.
+        """
+        tool_call_ids: List[str] = []
+        tool_response_ids: set[str] = set()
+
+        for msg in history:
+            if msg.get("role") == "assistant" and msg.get("tool_calls"):
+                for tc in msg["tool_calls"]:
+                    tc_id = tc.get("id")
+                    if tc_id:
+                        tool_call_ids.append(tc_id)
+            if msg.get("role") == "tool" and msg.get("tool_call_id"):
+                tool_response_ids.add(msg["tool_call_id"])
+
+        missing = [tc_id for tc_id in tool_call_ids if tc_id not in tool_response_ids]
+        if missing:
+            for tc_id in missing:
+                logger.warning(
+                    "[ResearcherAgent] Synthesizing tool response for missing tool_call_id=%s",
+                    tc_id,
+                )
+                history.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc_id,
+                        "content": f"Tool call {tc_id} had no recorded output. Marking as error.",
+                    }
+                )
 
     async def _execute_tool(
         self, tool_name: str, tool_input: Dict[str, Any]

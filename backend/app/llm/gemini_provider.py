@@ -155,6 +155,15 @@ class GeminiProvider(BaseLLMProvider):
             tool_calls = tool_calls or None
 
             if not content and not tool_calls:
+                fallback_text = None
+                try:
+                    fallback_text = response.text
+                except Exception:
+                    fallback_text = None
+                if fallback_text:
+                    content = fallback_text.strip()
+
+            if not content and not tool_calls:
                 reasons = {
                     str(getattr(candidate, "finish_reason", "") or "").upper()
                     for candidate in candidates

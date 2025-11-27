@@ -61,14 +61,15 @@ class LLMManager:
             openai_cfg = config["openai"]
             self.providers[LLMProvider.OPENAI] = OpenAIProvider(
                 api_key=openai_cfg["api_key"],
-                model=openai_cfg.get("model", "gpt-5-nano"),
+                model=openai_cfg.get("model", "gpt-4.1-mini"),
                 temperature=openai_cfg.get("temperature"),
                 max_tokens=openai_cfg.get("max_tokens"),
                 max_completion_tokens=openai_cfg.get("max_completion_tokens"),
+                reasoning_effort=openai_cfg.get("reasoning_effort"),
             )
             logger.info(
                 f"Initialized OpenAI provider with model: "
-                f"{config['openai'].get('model', 'gpt-5-nano')}"
+                f"{config['openai'].get('model', 'gpt-4.1-mini')}"
             )
 
         # Initialize Gemini provider if configured
