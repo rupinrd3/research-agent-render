@@ -83,7 +83,7 @@ export const EXAMPLE_QUERIES: ExampleQuery[] = [
  */
 export const DEFAULT_SETTINGS = {
   llmProvider: 'openai' as const,
-  llmModel: 'gpt-4.1-mini',
+  llmModel: 'gpt-5-nano',
   temperature: 0.7,
   maxIterations: 7,
   apiKeys: {
