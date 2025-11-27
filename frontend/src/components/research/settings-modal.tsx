@@ -274,7 +274,7 @@ export function SettingsModal({ open, onOpenChange }: SettingsModalProps) {
                     className="flex-1"
                   />
                   <div className="w-16 text-center">
-                    <Badge variant="outline">{localSettings.maxIterations}</Badge>
+                    <Badge variant="outline" className="text-white">{localSettings.maxIterations}</Badge>
                   </div>
                 </div>
                 <p className="text-xs text-white/70 mt-1">
