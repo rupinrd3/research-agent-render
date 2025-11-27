@@ -36,7 +36,7 @@ class LLMSettings(BaseModel):
 class ResearchSettings(BaseModel):
     """Research execution settings."""
 
-    max_iterations: int = 7
+    max_iterations: int = 6
     timeout_minutes: int = 15
     parallel_tool_execution: bool = False
     # Agent policy knobs

@@ -21,7 +21,7 @@ llm:
   # OpenAI Configuration
   openai:
     api_key: "${OPENAI_API_KEY}"
-    model: "gpt-4.1-mini"  # Fast, low-cost default (set to "gpt-5-mini" or "gpt-5-nano" for reasoning tasks)
+    model: "gpt-5-nano"  # Default: GPT-5 nano (Responses API); switch to gpt-5-mini for stronger reasoning or gpt-4.1-mini for lower cost
     temperature: 0.7
 
   # Google Gemini Configuration
@@ -34,17 +34,14 @@ llm:
   # OpenRouter Configuration (multi-model via OpenRouter free tier)
   openrouter:
     api_key: "${OPENROUTER_API_KEY}"
-    model: "nvidia/llama-3.3-nemotron-super-49b-v1.5"
-    alternate_models:
-      - "minimax/minimax-m2:free"
-      - "meta-llama/llama-3.3-70b-instruct:free"
-      - "deepseek/deepseek-r1-0528:free"
+    model: "openai/gpt-oss-20b:free"
+    alternate_models: []
     temperature: 0.7
     max_tokens: 8000
 
 # Research Execution Settings
 research:
-  max_iterations: 7  # Maximum ReAct iterations
+  max_iterations: 6  # Maximum ReAct iterations
   timeout_minutes: 15  # Timeout for complete research session
   parallel_tool_execution: false  # Execute tools in parallel (experimental)
   finish_guard_enabled: true

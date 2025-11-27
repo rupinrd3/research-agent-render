@@ -12,7 +12,7 @@ llm:
   # OpenAI Configuration
   openai:
     api_key: "${OPENAI_API_KEY}"  # Set via environment variable
-    model: "gpt-4.1-mini"  # Options: gpt-4.1-mini, gpt-5-mini, gpt-5-nano, gpt-4o, gpt-4-turbo
+    model: "gpt-5-nano"  # Default: gpt-5-nano (GPT-5 Responses API); options: gpt-4.1-mini, gpt-5-mini, gpt-4o, gpt-4-turbo
     temperature: 0.7
     max_tokens: 2000
 
@@ -26,17 +26,14 @@ llm:
   # OpenRouter Configuration (for Nemotron, DeepSeek, etc.)
   openrouter:
     api_key: "${OPENROUTER_API_KEY}"  # Set via environment variable
-    model: "deepseek/deepseek-r1-0528:free"
-    alternate_models:
-      - "minimax/minimax-m2:free"
-      - "meta-llama/llama-3.3-70b-instruct:free"
-      - "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+    model: "openai/gpt-oss-20b:free"
+    alternate_models: []
     temperature: 0.7
     max_tokens: 2000
 
 # Research Settings
 research:
-  max_iterations: 7  # Maximum ReAct iterations per session
+  max_iterations: 6  # Maximum ReAct iterations per session
   timeout_minutes: 15  # Session timeout
   parallel_tool_execution: false  # Execute tools in parallel (experimental)
 

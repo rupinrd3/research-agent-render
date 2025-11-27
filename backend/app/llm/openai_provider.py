@@ -35,7 +35,7 @@ class OpenAIProvider(BaseLLMProvider):
     def __init__(
         self,
         api_key: str,
-        model: str = "gpt-4.1-mini",
+        model: str = "gpt-5-nano",
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
         max_completion_tokens: Optional[int] = None,
@@ -46,7 +46,7 @@ class OpenAIProvider(BaseLLMProvider):
 
         Args:
             api_key: OpenAI API key
-            model: Model name (default: gpt-4.1-mini)
+            model: Model name (default: gpt-5-nano)
             temperature: Preferred default temperature
             max_tokens: Legacy max token budget
             max_completion_tokens: Responses API max token budget
