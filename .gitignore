@@ -95,3 +95,9 @@ compare_folders.py
 
 # Backend duplicate directory (cleanup needed)
 backend/backend/
+
+# GPT-5 verification and test files
+GPT5_FIX_ANALYSIS.md
+GPT5_FIX_SUMMARY.md
+VERIFICATION_RESULTS.md
+backend/test_gpt5_conversion.py
