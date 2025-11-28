@@ -1,8 +1,8 @@
 """
 OpenRouter Provider
 
-Implements the BaseLLMProvider interface for OpenRouter's API.
-Supports access to models via DeepInfra and other providers.
+Implements the BaseLLMProvider interface for OpenRouter's API and manages
+tool-capable models across providers exposed via OpenRouter.
 """
 
 import logging
@@ -19,36 +19,29 @@ class OpenRouterProvider(BaseLLMProvider):
     """
     OpenRouter API provider.
 
-    Provides access to various models including Nvidia's Nemotron 49B
-    via DeepInfra and other providers through OpenRouter's unified API.
+    Provides access to various models (OpenAI, Anthropic, Mistral, Nvidia)
+    through OpenRouter's unified API.
     """
 
-    # Pricing per 1M tokens (as of 2025)
+    # Pricing per 1M tokens (approximate; update with provider announcements)
+    # Tool-capable models requested (as of 2025-11-27).
     PRICING = {
-        "nvidia/llama-3.3-nemotron-super-49b-v1.5": {
-            "input": 0.40,
-            "output": 0.40,
-        },
-        "meta-llama/llama-3.1-70b-instruct": {
-            "input": 0.35,
-            "output": 0.40,
-        },
-        "deepseek/deepseek-r1-0528:free": {"input": 0.0, "output": 0.0},
-        "minimax/minimax-m2:free": {"input": 0.0, "output": 0.0},
-        "meta-llama/llama-3.3-70b-instruct:free": {"input": 0.0, "output": 0.0},
+        "openai/gpt-oss-safeguard-20b": {"input": 0.30, "output": 0.30},
+        "moonshotai/kimi-k2-thinking": {"input": 0.45, "output": 0.45},
+        "openai/gpt-oss-120b": {"input": 1.20, "output": 1.20},
     }
 
+    # Recommended tool-capable models (small → mid → large)
     DEFAULT_MODEL_PRIORITY = [
-        "deepseek/deepseek-r1-0528:free",
-        "minimax/minimax-m2:free",
-        "meta-llama/llama-3.3-70b-instruct:free",
-        "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+        "openai/gpt-oss-safeguard-20b",
+        "moonshotai/kimi-k2-thinking",
+        "openai/gpt-oss-120b",
     ]
 
     def __init__(
         self,
         api_key: str,
-        model: str = "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+        model: str = "openai/gpt-oss-safeguard-20b",
         alternate_models: Optional[List[str]] = None,
     ):
         """
@@ -56,7 +49,7 @@ class OpenRouterProvider(BaseLLMProvider):
 
         Args:
             api_key: OpenRouter API key
-            model: Model name (default: nvidia nemotron-49b)
+            model: Preferred model (default: gpt-oss-safeguard-20b, tool-capable)
         """
         self.api_key = api_key
         model_priority: List[str] = []

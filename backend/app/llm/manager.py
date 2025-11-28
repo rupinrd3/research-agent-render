@@ -25,7 +25,7 @@ class LLMManager:
     Supports three providers:
     1. OpenAI (configurable model)
     2. Gemini 2.5 Flash
-    3. OpenRouter (Nemotron 49B via DeepInfra)
+    3. OpenRouter (configurable, tool-capable models)
 
     Features:
     - Automatic fallback on provider failure
@@ -85,11 +85,11 @@ class LLMManager:
             self.providers[LLMProvider.OPENROUTER] = OpenRouterProvider(
                 api_key=config["openrouter"]["api_key"],
                 model=config["openrouter"].get(
-                    "model", "nvidia/llama-3.3-nemotron-super-49b-v1.5"
+                    "model", "openai/gpt-4o-mini"
                 ),
                 alternate_models=config["openrouter"].get("alternate_models", []),
             )
-            logger.info("Initialized OpenRouter provider with Nemotron 49B")
+            logger.info("Initialized OpenRouter provider with OpenRouter models")
 
         # Set primary and fallback providers
         primary_name = config.get("primary", "openai")

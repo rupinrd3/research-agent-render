@@ -24,12 +24,26 @@ class OpenAIProvider(BaseLLMProvider):
     Supports GPT and other OpenAI models with automatic token counting and cost estimation.
     """
 
-    # Pricing per 1M tokens (placeholder estimates, update when official rates change)
+    # Pricing per 1M tokens (official OpenAI pricing snapshot)
     PRICING = {
-        "gpt-4.1-mini": {"input": 0.18, "output": 0.72},
-        "gpt-5-nano": {"input": 0.10, "output": 0.40},
-        "gpt-5-mini": {"input": 0.25, "output": 1.00},
-        "gpt-5": {"input": 1.00, "output": 5.00},
+        # GPT-5 family
+        "gpt-5.1": {"input": 1.25, "output": 10.00},
+        "gpt-5": {"input": 1.25, "output": 10.00},
+        "gpt-5-mini": {"input": 0.25, "output": 2.00},
+        "gpt-5-nano": {"input": 0.05, "output": 0.40},
+        "gpt-5.1-chat-latest": {"input": 1.25, "output": 10.00},
+        "gpt-5-chat-latest": {"input": 1.25, "output": 10.00},
+        "gpt-5.1-codex": {"input": 1.25, "output": 10.00},
+        "gpt-5-codex": {"input": 1.25, "output": 10.00},
+        "gpt-5-pro": {"input": 15.00, "output": 120.00},
+        # GPT-4.1 family
+        "gpt-4.1": {"input": 2.00, "output": 8.00},
+        "gpt-4.1-mini": {"input": 0.40, "output": 1.60},
+        "gpt-4.1-nano": {"input": 0.10, "output": 0.40},
+        # GPT-4o family
+        "gpt-4o": {"input": 2.50, "output": 10.00},
+        "gpt-4o-2024-05-13": {"input": 5.00, "output": 15.00},
+        "gpt-4o-mini": {"input": 0.15, "output": 0.60},
     }
 
     def __init__(
@@ -291,9 +305,7 @@ class OpenAIProvider(BaseLLMProvider):
         and `function_call_output` for tool responses.
         """
         inputs: List[Dict[str, Any]] = []
-        function_call_ids: List[str] = []
-        output_call_ids: List[str] = []
-        call_id_map: Dict[str, str] = {}
+        call_id_map: Dict[str, str] = {}  # Maps original IDs to normalized IDs
         for msg in messages:
             role = msg.get("role", "user")
             normalized_text = self._normalize_message_content(msg.get("content"))
@@ -304,7 +316,6 @@ class OpenAIProvider(BaseLLMProvider):
                     orig_call_id or "tool_call"
                 )
                 call_id_map[orig_call_id] = normalized_call_id
-                output_call_ids.append(normalized_call_id)
                 inputs.append(
                     {
                         "type": "function_call_output",
@@ -329,54 +340,65 @@ class OpenAIProvider(BaseLLMProvider):
                         {"type": "output_text", "text": normalized_text}
                     )
 
+                # Add function_calls as content parts within the assistant message
+                # This matches the Responses API output format where function_calls
+                # appear inside message content, not as standalone items in input
+                if msg.get("tool_calls"):
+                    for tc in msg["tool_calls"]:
+                        func = tc.get("function", {}) or {}
+                        orig_id = tc.get("id") or func.get("name") or "function_call"
+                        normalized_id = self._normalize_function_call_id(orig_id)
+                        call_id_map[orig_id] = normalized_id
+
+                        # Parse arguments to dict format for Responses API
+                        arguments = func.get("arguments", "{}")
+                        if isinstance(arguments, str):
+                            try:
+                                arguments = json.loads(arguments)
+                            except Exception:
+                                logger.warning(f"Failed to parse function arguments as JSON: {arguments}")
+                                arguments = {}
+
+                        # Add function_call as a content part (not standalone item)
+                        # Note: Using call_id per Responses API spec
+                        content_parts.append({
+                            "type": "function_call",
+                            "call_id": normalized_id,
+                            "name": func.get("name"),
+                            "arguments": arguments
+                        })
+
             message_item: Dict[str, Any] = {"role": msg_role}
             if content_parts:
                 message_item["content"] = content_parts
 
             inputs.append(message_item)
 
-            if msg.get("tool_calls"):
-                for tc in msg["tool_calls"]:
-                    func = tc.get("function", {}) or {}
-                    orig_id = tc.get("id") or func.get("name") or "function_call"
-                    normalized_id = self._normalize_function_call_id(orig_id)
-                    call_id_map[orig_id] = normalized_id
-                    function_call_ids.append(normalized_id)
-                    arguments = func.get("arguments", "{}")
-                    if not isinstance(arguments, str):
-                        try:
-                            arguments = json.dumps(arguments)
-                        except Exception:
-                            arguments = str(arguments)
-                    inputs.append(
-                        {
-                            "type": "function_call",
-                            "id": normalized_id,
-                            "call_id": normalized_id,
-                            "name": func.get("name"),
-                            "arguments": arguments,
-                        }
-                    )
-        # Recompute coverage and add placeholder outputs for any function calls that lack outputs
-        fc_ids = {item.get("id") or item.get("call_id") for item in inputs if item.get("type") == "function_call"}
-        fc_output_ids = {item.get("call_id") for item in inputs if item.get("type") == "function_call_output"}
-        missing_outputs = fc_ids - fc_output_ids
-        for call_id in missing_outputs:
-            inputs.append({"type": "function_call_output", "call_id": call_id, "output": ""})
+        # Final pass: ensure all function_call_output IDs are normalized
+        # (function_calls are now in message content, not standalone items)
+        for item in inputs:
+            if item.get("type") == "function_call_output":
+                raw_call_id = item.get("call_id") or ""
+                # Normalize the call_id to ensure consistency
+                normalized_id = self._normalize_function_call_id(raw_call_id)
+                item["call_id"] = normalized_id
 
         return inputs
 
     def _normalize_function_call_id(self, call_id: Optional[str]) -> str:
         """
-        Keep function call IDs stable across calls.
+        Normalize function call IDs for the Responses API.
 
-        The Responses API only requires that each function_call has a matching
-        function_call_output with the same call_id; it does not require a
-        particular prefix. Preserve the model-provided ID to avoid mismatches.
+        GPT-5's Responses API expects function_call IDs to start with "fc".
+        We keep IDs stable but coerce them into the required shape so that
+        paired function_call_output entries are accepted.
         """
-        if not call_id:
-            return "function_call"
-        return str(call_id)
+        base_id = str(call_id or "function_call")
+        # Replace spaces/unsafe characters to keep IDs Responses-compatible
+        safe_id = "".join(ch if ch.isalnum() or ch in {"_", "-"} else "_" for ch in base_id)
+        if not safe_id.startswith("fc"):
+            safe_id = f"fc_{safe_id}"
+        return safe_id
 
     def _parse_responses_output(
         self, response: Any

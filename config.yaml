@@ -31,11 +31,13 @@ llm:
     temperature: 0.7
     max_tokens: 8000
 
-  # OpenRouter Configuration (multi-model via OpenRouter free tier)
+  # OpenRouter Configuration (tool-capable models via OpenRouter)
   openrouter:
     api_key: "${OPENROUTER_API_KEY}"
-    model: "openai/gpt-oss-20b:free"
-    alternate_models: []
+    model: "openai/gpt-oss-safeguard-20b"  # small/safety
+    alternate_models:
+      - "moonshotai/kimi-k2-thinking"      # medium / deep reasoning
+      - "openai/gpt-oss-120b"              # large
     temperature: 0.7
     max_tokens: 8000
 

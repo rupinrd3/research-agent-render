@@ -23,11 +23,13 @@ llm:
     temperature: 0.7
     max_tokens: 2000
 
-  # OpenRouter Configuration (for Nemotron, DeepSeek, etc.)
+  # OpenRouter Configuration (tool-capable, open-source models)
   openrouter:
     api_key: "${OPENROUTER_API_KEY}"  # Set via environment variable
-    model: "openai/gpt-oss-20b:free"
-    alternate_models: []
+    model: "openai/gpt-oss-safeguard-20b"  # Tool-capable default (small/safety)
+    alternate_models:
+      - "moonshotai/kimi-k2-thinking"      # Medium / deep reasoning
+      - "openai/gpt-oss-120b"              # Large
     temperature: 0.7
     max_tokens: 2000
 
