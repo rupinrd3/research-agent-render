@@ -118,6 +118,9 @@ export function WelcomeModal({ forceShow = false }: WelcomeModalProps) {
               <li className="leading-relaxed">The agent creates a plan, searches the web, reads pages, and summarizes evidence.</li>
               <li className="leading-relaxed">It iterates until it has enough signal, then produces a structured report.</li>
             </ul>
+            <p className="text-sm text-white mt-3 ml-4 italic">
+              <strong>Note:</strong> The entire process typically takes about 5 minutes to start the services and complete the research.
+            </p>
           </section>
 
           {/* What you see Section */}
