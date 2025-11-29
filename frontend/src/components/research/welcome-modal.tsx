@@ -87,7 +87,7 @@ export function WelcomeModal({ forceShow = false }: WelcomeModalProps) {
           </p>
 
           {/* Mobile Notice */}
-          <p className="text-sm text-center text-slate-300 font-semibold">
+          <p className="text-sm text-left text-white font-semibold">
             For mobile devices, view this page in Landscape mode.
           </p>
 
