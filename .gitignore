@@ -101,3 +101,10 @@ GPT5_FIX_ANALYSIS.md
 GPT5_FIX_SUMMARY.md
 VERIFICATION_RESULTS.md
 backend/test_gpt5_conversion.py
+
+# Screenshots and temporary documentation
+*.png
+GEMINI.md
+.mailmap
+AGENTS.md
+CLAUDE.md

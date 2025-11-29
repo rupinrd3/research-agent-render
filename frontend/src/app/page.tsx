@@ -12,6 +12,7 @@ import { QueryInput } from '@/components/research/query-input';
 import { ReactTraceTimeline } from '@/components/research/react-trace-timeline';
 import { ResearchOutputPanel } from '@/components/research/research-output-panel';
 import { SettingsModal } from '@/components/research/settings-modal';
+import { WelcomeModal } from '@/components/research/welcome-modal';
 import { MetricsDashboard } from '@/components/research/metrics-dashboard';
 import { WorkflowChart } from '@/components/workflow/WorkflowChart';
 import { useResearchStore, useMetrics } from '@/store/research-store';
@@ -219,6 +220,9 @@ export default function ResearchPage() {
 
       {/* Settings Modal */}
       <SettingsModal open={showSettings} onOpenChange={setShowSettings} />
+
+      {/* Welcome Modal - shows on first visit */}
+      <WelcomeModal />
 
       {/* TODO: History Modal */}
       {/* <HistoryModal open={showHistory} onOpenChange={setShowHistory} /> */}
