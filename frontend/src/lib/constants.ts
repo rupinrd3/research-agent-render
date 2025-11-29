@@ -100,7 +100,7 @@ export const DEFAULT_SETTINGS = {
   llmProvider: 'openai' as const,
   llmModel: 'gpt-5-nano',
   temperature: 0.7,
-  maxIterations: 7,
+  maxIterations: 6,
   apiKeys: {
     openai: '',
     gemini: '',
