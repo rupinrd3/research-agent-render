@@ -215,9 +215,10 @@ class OpenAIProvider(BaseLLMProvider):
                 "gpt-5 models require temperature=1.0. Overriding requested temperature %.2f -> 1.0",
                 temperature,
             )
+        inputs = self._to_responses_input(messages)
         kwargs: Dict[str, Any] = {
             "model": self.model,
-            "input": self._to_responses_input(messages),
+            "input": inputs,
             "temperature": 1.0,
         }
         if self.reasoning_effort:
@@ -301,19 +302,22 @@ class OpenAIProvider(BaseLLMProvider):
         """
         Convert Chat Completions history into Responses API input items.
 
-        Uses message items with `input_text` parts, `function_call` for assistant tool calls,
-        and `function_call_output` for tool responses.
+        Returns Inputs containing message history using
+        `input_text` / `output_text` parts and function_call_output items for tools.
+        This aligns with Responses API schema (no top-level tool_outputs).
         """
         inputs: List[Dict[str, Any]] = []
         call_id_map: Dict[str, str] = {}  # Maps original IDs to normalized IDs
+
         for msg in messages:
             role = msg.get("role", "user")
             normalized_text = self._normalize_message_content(msg.get("content"))
 
+            # Tool outputs become function_call_output items
             if role == "tool":
                 orig_call_id = msg.get("tool_call_id") or ""
                 normalized_call_id = call_id_map.get(orig_call_id) or self._normalize_function_call_id(
-                    orig_call_id or "tool_call"
+                    orig_call_id or "function_call"
                 )
                 call_id_map[orig_call_id] = normalized_call_id
                 inputs.append(
@@ -340,48 +344,40 @@ class OpenAIProvider(BaseLLMProvider):
                         {"type": "output_text", "text": normalized_text}
                     )
 
-                # Add function_calls as content parts within the assistant message
-                # This matches the Responses API output format where function_calls
-                # appear inside message content, not as standalone items in input
-                if msg.get("tool_calls"):
-                    for tc in msg["tool_calls"]:
-                        func = tc.get("function", {}) or {}
-                        orig_id = tc.get("id") or func.get("name") or "function_call"
-                        normalized_id = self._normalize_function_call_id(orig_id)
-                        call_id_map[orig_id] = normalized_id
+                # Include assistant tool calls as function_call items
+                for tc in msg.get("tool_calls") or []:
+                    func = tc.get("function", {}) or {}
+                    orig_id = tc.get("id") or func.get("name") or "function_call"
+                    normalized_id = call_id_map.get(orig_id) or self._normalize_function_call_id(orig_id)
+                    call_id_map[orig_id] = normalized_id
 
-                        # Parse arguments to dict format for Responses API
-                        arguments = func.get("arguments", "{}")
-                        if isinstance(arguments, str):
-                            try:
-                                arguments = json.loads(arguments)
-                            except Exception:
-                                logger.warning(f"Failed to parse function arguments as JSON: {arguments}")
-                                arguments = {}
+                    arguments = func.get("arguments", {})
+                    if isinstance(arguments, str):
+                        try:
+                            arguments = json.loads(arguments)
+                        except Exception:
+                            arguments = {}
+                    # Responses API expects arguments as a string payload
+                    if not isinstance(arguments, str):
+                        try:
+                            arguments = json.dumps(arguments)
+                        except Exception:
+                            arguments = "{}"
 
-                        # Add function_call as a content part (not standalone item)
-                        # Note: Using call_id per Responses API spec
-                        content_parts.append({
+                    inputs.append(
+                        {
                             "type": "function_call",
                             "call_id": normalized_id,
                             "name": func.get("name"),
-                            "arguments": arguments
-                        })
+                            "arguments": arguments,
+                        }
+                    )
 
-            message_item: Dict[str, Any] = {"role": msg_role}
-            if content_parts:
-                message_item["content"] = content_parts
+            if not content_parts:
+                continue
 
+            message_item: Dict[str, Any] = {"type": "message", "role": msg_role, "content": content_parts}
             inputs.append(message_item)
-
-        # Final pass: ensure all function_call_output IDs are normalized
-        # (function_calls are now in message content, not standalone items)
-        for item in inputs:
-            if item.get("type") == "function_call_output":
-                raw_call_id = item.get("call_id") or ""
-                # Normalize the call_id to ensure consistency
-                normalized_id = self._normalize_function_call_id(raw_call_id)
-                item["call_id"] = normalized_id
 
         return inputs
 
@@ -389,15 +385,12 @@ class OpenAIProvider(BaseLLMProvider):
         """
         Normalize function call IDs for the Responses API.
 
-        GPT-5's Responses API expects function_call IDs to start with "fc".
-        We keep IDs stable but coerce them into the required shape so that
-        paired function_call_output entries are accepted.
+        Keep IDs stable and sanitize unsafe characters so paired
+        function_call_output entries are accepted.
         """
         base_id = str(call_id or "function_call")
         # Replace spaces/unsafe characters to keep IDs Responses-compatible
         safe_id = "".join(ch if ch.isalnum() or ch in {"_", "-"} else "_" for ch in base_id)
-        if not safe_id.startswith("fc"):
-            safe_id = f"fc_{safe_id}"
         return safe_id
 
     def _parse_responses_output(
