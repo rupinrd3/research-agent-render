@@ -52,7 +52,6 @@ export default function ResearchPage() {
     report,
     isGeneratingReport,
     startResearch,
-    stopResearch,
   } = useResearchStore();
 
   // Get metrics from store
@@ -204,19 +203,6 @@ export default function ResearchPage() {
           />
         </div>
       </main>
-
-      {/* Stop Research Button (floating) */}
-      {isResearching && (
-        <div className="fixed bottom-8 right-8 z-50 animate-in fade-in zoom-in duration-300">
-          <button
-            onClick={stopResearch}
-            className="px-6 py-3 rounded-full bg-red-600 hover:bg-red-700 text-white font-medium shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-          >
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            Stop Research
-          </button>
-        </div>
-      )}
 
       {/* Settings Modal */}
       <SettingsModal open={showSettings} onOpenChange={setShowSettings} />

@@ -182,14 +182,14 @@ FINISH_DEFINITION = {
                     "description": (
                         "Comprehensive Markdown Deep Research Report (>=600 words) with adaptive structure:\n"
                         "1. # {Topic Title}\n"
-                        "2. ## TL;DR – 4-6 bullet takeaways with quantified facts when possible.\n"
-                        "3. ## Methodology & Evidence Quality – summarize tools/sources, recency filters, and explicitly state a “Coverage gaps & confidence” clause.\n"
-                        "4. ## Key Facts – table or bullet list of the most critical quantitative facts (specs, timelines, stakeholder impacts, etc.) tailored to the topic.\n"
-                        "5. ## Findings & Analysis – create topic-appropriate sections (### ...) that can span business, technical, policy, societal, academic, political, or cultural angles.\n"
-                        "6. ## Implementation / Impact – deployments, market traction, costs, or architecture as relevant.\n"
-                        "7. ## Gaps & Open Questions – highlight missing data or research needs.\n"
-                        "8. ## Recommended Next Steps – actionable guidance for decision-makers.\n"
-                        "9. ## Sources – numbered list matching the inline references. Additional sections may be added to fit the query context."
+                        "2. ## TL;DR - 4-6 bullet takeaways with quantified facts when possible.\n"
+                        "3. ## Methodology & Evidence Quality - summarize tools/sources, recency filters, and explicitly state a Coverage gaps & confidence clause.\n"
+                        "4. ## Key Facts - table or bullet list of the most critical quantitative facts (specs, timelines, stakeholder impacts, etc.) tailored to the topic.\n"
+                        "5. ## Findings & Analysis - create topic-appropriate sections (### ...) that can span business, technical, policy, societal, academic, political, or cultural angles.\n"
+                        "6. ## Implementation / Impact - deployments, market traction, costs, or architecture as relevant.\n"
+                        "7. ## Gaps & Open Questions - highlight missing data or research needs.\n"
+                        "8. ## Recommended Next Steps - actionable guidance for decision-makers.\n"
+                        "Do not include a Sources section in the report body; sources are supplied separately via the structured sources field."
                     ),
                 },
                 "sources": {

@@ -329,6 +329,10 @@ Approve only if the report covers the query, cites authoritative sources, and ad
 
                 logger.info(f"Iteration {iteration}/{self.max_iterations}")
 
+                iteration_start_time = time.time()
+                iteration_action = "pending"
+                thought: str = ""
+
                 # Emit iteration start
                 await self._emit_trace("iteration_start", {
                     "iteration": iteration,
@@ -436,6 +440,7 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                         })
                         continue
 
+                    iteration_action = tool_calls[0]["function"]["name"]
                     assistant_message = {
                         "role": "assistant",
                         "content": thought,
@@ -540,16 +545,6 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                                                 "Finish guard guidance: "
                                                 f"{guard_hint} Use the most relevant tool to close the gap."
                                             ),
-                                        }
-                                    )
-                                if self.metrics_collector and idx == 0:
-                                    self.metrics_collector.add_iteration(
-                                        {
-                                            "iteration": iteration,
-                                            "duration": step_latency,
-                                            "timestamp": datetime.utcnow().isoformat(),
-                                            "thought": thought[:200],
-                                            "action": "finish_guard_rejected",
                                         }
                                     )
                                 continue
@@ -760,16 +755,6 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                             )
                             steps.append(step)
 
-                            # Record iteration in metrics collector
-                            if self.metrics_collector:
-                                self.metrics_collector.add_iteration({
-                                    "iteration": iteration,
-                                    "duration": step_latency,
-                                    "timestamp": datetime.utcnow().isoformat(),
-                                    "thought": thought[:200],  # Truncated
-                                    "action": action_name,
-                                })
-
                     if done:
                         break
 
@@ -781,6 +766,16 @@ Approve only if the report covers the query, cites authoritative sources, and ad
                     }, iteration)
                     error = str(e)
                     break
+                finally:
+                    if self.metrics_collector:
+                        iteration_duration = time.time() - iteration_start_time
+                        self.metrics_collector.add_iteration({
+                            "iteration": iteration,
+                            "duration": iteration_duration,
+                            "timestamp": datetime.utcnow().isoformat(),
+                            "thought": thought[:200] if isinstance(thought, str) else "",
+                            "action": iteration_action or "none",
+                        })
 
             # Calculate total metrics
             if not done:
