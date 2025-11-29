@@ -74,7 +74,7 @@ export function WelcomeModal({ forceShow = false }: WelcomeModalProps) {
         <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-6 border-b border-slate-700">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-white">
-              Welcome to Research Agent
+              Quick Guide
             </DialogTitle>
           </DialogHeader>
         </div>
@@ -84,6 +84,11 @@ export function WelcomeModal({ forceShow = false }: WelcomeModalProps) {
           {/* Welcome Text */}
           <p className="text-base text-white leading-relaxed">
             This app is an <strong className="text-blue-400 font-semibold">Agentic AI Researcher</strong>: it plans, searches the web, reads sources, and writes a report for you. If you've used ChatGPT, this feels familiar—except the agent runs multiple steps and tools automatically.
+          </p>
+
+          {/* Mobile Notice */}
+          <p className="text-sm text-center text-slate-300 font-semibold">
+            For mobile devices, view this page in Landscape mode.
           </p>
 
           {/* Purpose Section */}
